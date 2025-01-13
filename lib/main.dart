@@ -1,13 +1,21 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hundy_p/home.dart';
-import 'package:firebase_core/firebase_core.dart';
+
+import 'firebase_messaging_setup.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Setup Firebase Messaging
+  await setupFirebaseMessaging();
+
   runApp(const HundyPApp());
 }
 

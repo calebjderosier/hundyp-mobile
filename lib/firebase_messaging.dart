@@ -1,19 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: ${message.messageId}");
+  print("Full message: $message");
+}
 
 Future<void> setupFirebaseMessaging() async {
   // Request notification permissions
   final notificationSettings =
       await FirebaseMessaging.instance.requestPermission(provisional: true);
 
-  // Get APNS token (for iOS)
-  final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-  if (apnsToken != null) {
-    // APNS token is available, make FCM plugin API requests...
-    print('APNS Token: $apnsToken');
-  }
-
-  // Fetch FCM token
+  // Fetch FCM token, web
   final vapidKey = dotenv.env['FIREBASE_VAPID_KEY'];
 
   if (vapidKey == null || vapidKey.isEmpty) {
@@ -34,6 +34,7 @@ Future<void> setupFirebaseMessaging() async {
     print('Error refreshing FCM token: $err');
   });
 
+  // Foreground messaging
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
     print('Message data: ${message.data}');
@@ -42,4 +43,15 @@ Future<void> setupFirebaseMessaging() async {
       print('Message also contained a notification: ${message.notification}');
     }
   });
+
+  // Get APNS token (for iOS)
+  final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+  if (apnsToken != null) {
+    // APNS token is available, make FCM plugin API requests...
+    print('APNS Token: $apnsToken');
+  }
+
+  // Background messaging
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
 }

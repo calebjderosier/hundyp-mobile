@@ -1,3 +1,6 @@
+// is this necessary here
+rootProject.name = 'hundyp-mobile'
+
 include ':app'
 
 def localPropertiesFile = new File(rootProject.projectDir, "local.properties")

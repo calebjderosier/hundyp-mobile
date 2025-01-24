@@ -1,4 +1,4 @@
-package com.example.hundy_p
+package com.example.hundyp
 
 import io.flutter.embedding.android.FlutterActivity
 

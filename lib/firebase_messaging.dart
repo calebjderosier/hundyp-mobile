@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -13,12 +14,8 @@ Future<void> setupFirebaseMessaging() async {
   final notificationSettings =
       await FirebaseMessaging.instance.requestPermission(provisional: true);
 
-  // Fetch FCM token, web
-  final vapidKey = dotenv.env['FIREBASE_VAPID_KEY'];
 
-  if (vapidKey == null || vapidKey.isEmpty) {
-    throw Exception("Valid key cannot be empty, please set as an env variable");
-  }
+
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   NotificationSettings settings = await messaging.requestPermission(
@@ -44,12 +41,8 @@ Future<void> setupFirebaseMessaging() async {
   }
 
 
-  // Firebase token
-  final fcmToken = await FirebaseMessaging.instance.getToken(
-    vapidKey: vapidKey, // Add your VAPID public key for web
-  );
+  final fcmToken = await getFcmToken();
 
-  print('FCM Token: $fcmToken');
 
   // Listen for token updates
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
@@ -73,4 +66,42 @@ Future<void> setupFirebaseMessaging() async {
   // Background messaging
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+}
+
+
+Future<String?> getFcmToken() async {
+  // Fetch FCM token, web
+  final vapidKey = dotenv.env['FIREBASE_VAPID_KEY'];
+
+  if (vapidKey == null || vapidKey.isEmpty) {
+    throw Exception("Valid key cannot be empty, please set as an env variable");
+  }
+
+  try {
+    final fcmToken = await FirebaseMessaging.instance.getToken(
+      vapidKey: vapidKey, // Add your VAPID public key for web
+    );
+    print("FCM Token: $fcmToken");
+    return fcmToken;
+  } catch (e) {
+    print("Error fetching FCM token: $e");
+    return null;
+  }
+}
+
+
+Future<void> storeFcmToken(String userId, String token) async {
+  try {
+    final tokensCollection = FirebaseFirestore.instance.collection('fcmTokens');
+
+    // Store or update the token for the user
+    await tokensCollection.doc(userId).set({
+      'fcmToken': token,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    print("FCM Token stored successfully for user: $userId");
+  } catch (e) {
+    print("Error storing FCM token: $e");
+  }
 }

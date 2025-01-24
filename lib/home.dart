@@ -46,16 +46,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _getAndPrintFcmToken() async {
-    try {
-      // Retrieve the Firebase token
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      print('FCM Token: $fcmToken');
-    } catch (e) {
-      print('Error retrieving FCM token: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Center(

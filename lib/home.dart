@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +17,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    print("initState called");
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -34,9 +34,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _onHundyPPress() {
-    // TODO: implement
+  Future<void> _onHundyPPress() async {
     _controller.forward(from: 0.0);
+
+    try {
+      // Retrieve the Firebase token
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      print('FCM Token: $fcmToken');
+    } catch (e) {
+      print('Error retrieving FCM token: $e');
+    }
+  }
+
+  Future<void> _getAndPrintFcmToken() async {
+    try {
+      // Retrieve the Firebase token
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      print('FCM Token: $fcmToken');
+    } catch (e) {
+      print('Error retrieving FCM token: $e');
+    }
   }
 
   @override

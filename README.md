@@ -20,4 +20,9 @@ Essentially, follow the tutorial for:
 1. installing flutter
 2. installing firebase
 
-todo - need to still run flutterfire configure for web I think
+
+## Useful flutter .zsh aliases
+
+## FLUTTER
+alias fr='flutter run'
+alias fd='flutter doctor -v'

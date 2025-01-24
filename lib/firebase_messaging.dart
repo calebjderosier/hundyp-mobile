@@ -19,7 +19,32 @@ Future<void> setupFirebaseMessaging() async {
   if (vapidKey == null || vapidKey.isEmpty) {
     throw Exception("Valid key cannot be empty, please set as an env variable");
   }
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  print('User granted permission: ${settings.authorizationStatus}');
+
+
+  // Get APNS token (for iOS)
+  final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+  if (apnsToken != null) {
+    // APNS token is available, make FCM plugin API requests...
+    print('APNS Token: $apnsToken');
+  } else {
+    print('APNS Token is null');
+  }
+
+
+  // Firebase token
   final fcmToken = await FirebaseMessaging.instance.getToken(
     vapidKey: vapidKey, // Add your VAPID public key for web
   );
@@ -44,12 +69,6 @@ Future<void> setupFirebaseMessaging() async {
     }
   });
 
-  // Get APNS token (for iOS)
-  final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-  if (apnsToken != null) {
-    // APNS token is available, make FCM plugin API requests...
-    print('APNS Token: $apnsToken');
-  }
 
   // Background messaging
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

@@ -19,7 +19,6 @@ Future<void> main() async {
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();
-  // acceptForegroundMessaging();
 
 
   runApp(const HundyPApp());

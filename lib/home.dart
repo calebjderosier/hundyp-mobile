@@ -1,5 +1,5 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:hundy_p/firebase/service/messaging_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -36,24 +36,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _onHundyPPress() async {
     _controller.forward(from: 0.0);
-
-    try {
-      // Retrieve the Firebase token
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      print('FCM Token: $fcmToken');
-    } catch (e) {
-      print('Error retrieving FCM token: $e');
-    }
-  }
-
-  Future<void> _getAndPrintFcmToken() async {
-    try {
-      // Retrieve the Firebase token
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      print('FCM Token: $fcmToken');
-    } catch (e) {
-      print('Error retrieving FCM token: $e');
-    }
+    uploadFcmToken();
   }
 
   @override
@@ -84,7 +67,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Roboto',
-                  color: Theme.of(context).colorScheme.onPrimary, // Dynamic text color
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  // Dynamic text color
                   letterSpacing: 2.0,
                 ),
               ),

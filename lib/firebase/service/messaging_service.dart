@@ -1,6 +1,8 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import '../repository/push_noti_token_repository.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -11,14 +13,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> setupFirebaseMessaging() async {
   // Request notification permissions
   final notificationSettings =
-      await FirebaseMessaging.instance.requestPermission(provisional: true);
+  await FirebaseMessaging.instance.requestPermission(provisional: true);
 
-  // Fetch FCM token, web
-  final vapidKey = dotenv.env['FIREBASE_VAPID_KEY'];
-
-  if (vapidKey == null || vapidKey.isEmpty) {
-    throw Exception("Valid key cannot be empty, please set as an env variable");
-  }
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   NotificationSettings settings = await messaging.requestPermission(
@@ -31,8 +27,8 @@ Future<void> setupFirebaseMessaging() async {
     sound: true,
   );
 
-  print('User granted permission: ${settings.authorizationStatus}');
-
+  print(
+      'User granted notification permission: ${settings.authorizationStatus}');
 
   // Get APNS token (for iOS)
   final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
@@ -43,18 +39,11 @@ Future<void> setupFirebaseMessaging() async {
     print('APNS Token is null');
   }
 
-
-  // Firebase token
-  final fcmToken = await FirebaseMessaging.instance.getToken(
-    vapidKey: vapidKey, // Add your VAPID public key for web
-  );
-
-  print('FCM Token: $fcmToken');
+  await uploadFcmToken();
 
   // Listen for token updates
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-    print('New FCM Token: $newToken');
-    // Send the new token to your server, if necessary
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    await updateUserToken(newToken);
   }).onError((err) {
     print('Error refreshing FCM token: $err');
   });
@@ -69,8 +58,36 @@ Future<void> setupFirebaseMessaging() async {
     }
   });
 
-
   // Background messaging
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+}
 
+Future<String?> getFcmToken() async {
+  // Fetch FCM token, web
+  final vapidKey = dotenv.env['FIREBASE_VAPID_KEY'];
+
+  if (vapidKey == null || vapidKey.isEmpty) {
+    throw Exception("Valid key cannot be empty, please set as an env variable");
+  }
+
+  try {
+    final fcmToken = await FirebaseMessaging.instance.getToken(
+      vapidKey: vapidKey, // Add your VAPID public key for web
+    );
+    print("FCM Token: $fcmToken");
+    return fcmToken;
+  } catch (e) {
+    print("Error fetching FCM token: $e");
+  }
+}
+
+Future<void> uploadFcmToken() async {
+  final token = await getFcmToken();
+  if (token == null) {
+    const message = 'Error!! Not good';
+    print(message);
+    throw FlutterError(message);
+  }
+
+  await updateUserToken(token);
 }

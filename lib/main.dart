@@ -4,7 +4,7 @@ import 'package:hundy_p/authenticate.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/home.dart';
 
-import 'firebase_messaging.dart';
+import 'firebase/service/messaging_service.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

@@ -1,10 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
-import 'firebase/push_noti_token_service.dart';
+import '../repository/push_noti_token_repository.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -29,7 +27,8 @@ Future<void> setupFirebaseMessaging() async {
     sound: true,
   );
 
-  print('User granted notification permission: ${settings.authorizationStatus}');
+  print(
+      'User granted notification permission: ${settings.authorizationStatus}');
 
   // Get APNS token (for iOS)
   final apnsToken = await FirebaseMessaging.instance.getAPNSToken();

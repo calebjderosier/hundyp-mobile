@@ -1,0 +1,23 @@
+lib/
+├── firebase/
+│   ├── auth/
+│   │   ├── auth_service.dart          # Firebase Authentication logic
+│   │   ├── auth_repository.dart      # Repository pattern for user data
+│   │   ├── auth_provider.dart        # State management for authentication
+│   │   ├── models/
+│   │   │   └── user_model.dart       # Custom user model (optional)
+│   ├── firestore/
+│   │   ├── firestore_service.dart    # Firestore service for CRUD operations
+│   │   ├── token_repository.dart     # Repository for handling push notification tokens
+│   │   ├── collections/
+│   │   │   └── push_notification_tokens.dart # Logic specific to pushNotificationTokens
+│   ├── firebase_initializer.dart     # Firebase initialization logic
+├── providers/
+│   ├── user_provider.dart            # State management for user data
+├── ui/
+│   ├── screens/
+│   │   ├── home_screen.dart          # UI for home
+│   │   ├── login_screen.dart         # UI for login
+│   ├── widgets/
+│       └── custom_button.dart        # Reusable UI components
+├── main.dart                         # App entry point

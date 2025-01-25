@@ -1,6 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:hundy_p/firebase_messaging.dart';
+import 'package:hundy_p/firebase/service/messaging_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});

@@ -32,6 +32,7 @@ exports.sendNotification = onCall(
         message: `The following fields are missing: ${missingFields.join(", ")}`,
       };
     }
+
     const body = message != null ? message : generateRandomMessage(displayName);
     const pushNotificationMessage = {
       notification: {
@@ -48,11 +49,8 @@ exports.sendNotification = onCall(
       const tokens = tokensSnapshot.docs.map((doc) => doc.data().fcmToken);
 
       if (tokens.length === 0) {
-        console.log("No tokens available.");
-        return {
-          success: false,
-          message: "No tokens found, unable to send Hundy P.",
-        };
+        console.log("No tokens available. Event will not be saved.");
+        return { success: false, message: "No tokens found. Event not saved." };
       }
 
       // Save the event to Firestore
@@ -64,17 +62,36 @@ exports.sendNotification = onCall(
       });
       console.log(`Saved Hundy P event to Firestore: ${eventDocRef.id}`);
 
-      // Send a notification to all tokens
-      const response = await messaging().sendEachForMulticast({
-        ...pushNotificationMessage,
-        tokens,
-      });
+      try {
+        // Send a notification to all tokens
+        const response = await messaging().sendEachForMulticast({
+          ...pushNotificationMessage,
+          tokens,
+        });
 
-      console.log("Notifications sent:", response);
-      return { success: true, message: "Notifications sent successfully." };
+        console.log("Notifications sent:", response);
+        return {
+          success: true,
+          message: "Notifications sent and event saved successfully.",
+        };
+      } catch (notificationError) {
+        console.error("Error sending notifications:", notificationError);
+
+        // Rollback the saved event if notification fails
+        await eventDocRef.delete();
+        console.log(`Rolled back event: ${eventDocRef.id}`);
+
+        return {
+          success: false,
+          message: "Failed to send notifications. Event rolled back.",
+        };
+      }
     } catch (error) {
-      console.error("Error sending notifications:", error);
-      return { success: false, message: "Error sending notifications." };
+      console.error("Error processing request:", error);
+      return {
+        success: false,
+        message: "An error occurred while processing the request.",
+      };
     }
   },
 );

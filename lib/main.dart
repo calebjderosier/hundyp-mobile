@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
-import 'package:hundy_p/home.dart';
+import 'package:hundy_p/screens/authenticated_home.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
 
 import 'firebase/service/messaging_service.dart';

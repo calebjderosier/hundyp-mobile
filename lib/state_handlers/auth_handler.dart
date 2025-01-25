@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/main.dart';
-import 'package:hundy_p/screens/unauthenticated.dart';
+import 'package:hundy_p/screens/unauthenticated_home.dart';
 
 class AuthHandler extends StatefulWidget {
   const AuthHandler({Key? key}) : super(key: key);

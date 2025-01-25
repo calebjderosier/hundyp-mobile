@@ -24,10 +24,7 @@ Future<List<PushNotificationTokenDocument>?> fetchAllUserTokens() async {
         .map(PushNotificationTokenDocument.fromFirestore)
         .toList();
 
-    final len = documents.length;
-
-    print('PRINTING DOCS $len');
-    documents.map((d) => {print(d)});
+    print('PRINTING DOCS $documents');
     return documents;
 
     // // Reference to the user's document in Firestore

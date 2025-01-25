@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hundy_p/authenticate.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/home.dart';
 
 import 'firebase/service/messaging_service.dart';
@@ -20,11 +20,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-await  signInWithFirebase();
-  // final user = await signInWithGoogleAndFetchPeopleData();
-  // if (user != null) {
-  //   storeFcmToken(user,'3434');
-  // }
+  await signInWithFirebase();
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();

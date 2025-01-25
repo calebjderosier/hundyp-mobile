@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-Future<User?> signInWithFirebase() async {
+Future<UserCredential?> signInWithFirebase() async {
   try {
     final webClientId = dotenv.env['FIREBASE_WEB_CLIENT_ID'];
 
@@ -50,47 +50,9 @@ Future<User?> signInWithFirebase() async {
 
     print('Signed in with Firebase as $userCredential');
     // Return the signed-in user
-    return userCredential.user;
+    return userCredential;
   } catch (e) {
     print('Error signing in with Google: $e');
-    return null;
-  }
-}
-
-Future<GoogleSignInAccount?> signInWithGoogleAndFetchPeopleData() async {
-  try {
-    final webClientId = dotenv.env['FIREBASE_WEB_CLIENT_ID'];
-
-    if (webClientId == null || webClientId.isEmpty) {
-      throw Exception(
-          "Web Client ID for Google Auth cannot be empty. Set it in your .env file.");
-    }
-
-    final GoogleSignIn googleSignIn = GoogleSignIn(
-      clientId: webClientId,
-      scopes: [
-        'email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-      ],
-    );
-
-    // Check if a user is already signed in
-    GoogleSignInAccount? googleUser = googleSignIn.currentUser;
-
-    if (googleUser == null) {
-      // If not signed in, trigger the sign-in flow
-      googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        print('User canceled sign-in.');
-        return null;
-      }
-    }
-
-    print('got user $googleUser');
-    return googleUser;
-  } catch (e) {
-    print('Error signing in with Google or fetching People API data: $e');
     return null;
   }
 }

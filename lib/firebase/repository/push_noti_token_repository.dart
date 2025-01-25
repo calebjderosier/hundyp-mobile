@@ -58,6 +58,7 @@ Future<void> updateUserToken(String fcmToken) async {
     await tokenDocRef.set(PushNotificationTokenModel(
       updatedAt: Timestamp.now(),
       fcmToken: fcmToken,
+      firstName: user.
     ));
     print('FCM Token stored successfully for user: $userId');
   } catch (e) {

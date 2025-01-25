@@ -19,16 +19,30 @@ class SnackBarHandler {
   // Show a SnackBar
   void showSnackBar({
     required String message,
-    Duration duration = const Duration(seconds: 6),
+    Duration? providedDuration,
   }) {
     if (_context == null) {
-      throw Exception('SnackBarHandler context is not set. Call setContext() first.');
+      throw Exception(
+          'SnackBarHandler context is not set. Call setContext() first.');
     }
+
+    // Rule of thumb for showing a snackbar is 1 second for every
+    // ~5-6 characters, with a minimum of 2 seconds and a maximum of 15 seconds.
+    final defaultDuration = providedDuration ??
+        Duration(
+          seconds: (message.length / 5).ceil().clamp(2, 15),
+        );
 
     ScaffoldMessenger.of(_context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        duration: duration,
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontSize: 24, // Larger font size for the text
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        duration: defaultDuration,
         behavior: SnackBarBehavior.floating,
       ),
     );

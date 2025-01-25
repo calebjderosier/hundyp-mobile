@@ -29,5 +29,6 @@ module.exports = {
     // prettier-ignore
     "indent": ["error", 2],
     "object-curly-spacing": 0,
+    "max-len": ["error", { code: 120 }],
   },
 };

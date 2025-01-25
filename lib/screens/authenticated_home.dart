@@ -1,7 +1,6 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hundy_p/firebase/service/messaging_service.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -38,11 +37,56 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _onHundyPPress() async {
     _controller.forward(from: 0.0);
-    final result = await FirebaseFunctions.instance.httpsCallable('sendNotification').call({
-      'displayName': FirebaseAuth.instance.currentUser!.displayName,
-      'message': 'ugh ugh ugh oh ya',
-    });
-    print('Result: ${result.data}');
+
+    // Show a dialog for user input
+    final description = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        String? inputText;
+        return AlertDialog(
+          title: const Text('Fuck ya! What\'d you do?'),
+          content: TextField(
+            onChanged: (value) {
+              inputText = value;
+            },
+            decoration: const InputDecoration(
+              hintText: 'Enter a description...',
+            ),
+            maxLines: 3,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(null); // Dismiss with no input
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(inputText); // Return the input
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: const Text('Send'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Call the Cloud Function with the user's input
+    try {
+      final result = await FirebaseFunctions.instance
+          .httpsCallable('sendNotification')
+          .call({
+        'displayName': FirebaseAuth.instance.currentUser!.displayName,
+        'message': description,
+      });
+      print('Result: ${result.data}');
+    } catch (e) {
+      print('Error sending notification: $e');
+    }
   }
 
   @override
@@ -74,7 +118,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Roboto',
                   color: Theme.of(context).colorScheme.onPrimary,
-                  // Dynamic text color
                   letterSpacing: 2.0,
                 ),
               ),

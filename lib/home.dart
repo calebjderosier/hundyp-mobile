@@ -78,13 +78,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 shape: const CircleBorder(),
                 elevation: 10,
               ),
-              child: const Text(
+              child: Text(
                 'Hundy P',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Roboto',
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onPrimary, // Dynamic text color
                   letterSpacing: 2.0,
                 ),
               ),
@@ -93,5 +93,4 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
     );
-  }
-}
+  }}

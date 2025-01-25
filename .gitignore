@@ -46,6 +46,9 @@ app.*.map.json
 /android/app/release
 android/build
 
+# Build files
+node_modules
+
 # Secret files
 .env
 google-services.json

@@ -20,8 +20,11 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await signInWithGoogleAndFetchPeopleData();
-  // await signInWithFirebase();
+await  signInWithFirebase();
+  // final user = await signInWithGoogleAndFetchPeopleData();
+  // if (user != null) {
+  //   storeFcmToken(user,'3434');
+  // }
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();

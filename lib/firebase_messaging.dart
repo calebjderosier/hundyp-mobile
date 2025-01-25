@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -89,6 +90,7 @@ Future<void> storeFcmToken(String? token) async {
   }
 
   try {
+
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
@@ -109,6 +111,7 @@ Future<void> storeFcmToken(String? token) async {
       };
     }).toList();
 
+    print('PRINTING DOCS');
     print(docs.first);
 
     // // Reference to the user's document in Firestore

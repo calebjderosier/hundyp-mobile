@@ -3,12 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class PushNotificationTokenModel {
   final String userId;
   final Timestamp updatedAt;
-  final String token;
+  final String fcmToken;
 
   PushNotificationTokenModel({
     required this.userId,
     required this.updatedAt,
-    required this.token,
+    required this.fcmToken,
   });
 
   // Factory constructor to create the model from Firestore data
@@ -16,12 +16,12 @@ class PushNotificationTokenModel {
       PushNotificationTokenModel(
         userId: data['userId'] as String,
         updatedAt: (data['updatedAt'] as Timestamp),
-        token: data['token'] as String,
+        fcmToken: data['fcmToken'] as String,
       );
 
   @override
   String toString() {
-    return 'PushNotificationTokenModel(userId: $userId, updatedAt: ${updatedAt.toDate()}, token: $token)';
+    return 'PushNotificationTokenModel(userId: $userId, updatedAt: ${updatedAt.toDate()}, fcmToken: $fcmToken)';
   }
 }
 

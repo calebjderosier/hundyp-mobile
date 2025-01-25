@@ -46,7 +46,11 @@ exports.sendNotification = onCall(
       const tokensSnapshot = await firestore()
         .collection("pushNotificationTokens")
         .get();
-      const tokens = tokensSnapshot.docs.map((doc) => doc.data().fcmToken);
+      const tokens: string[] = tokensSnapshot.docs.map((doc) => {
+        // only return those which do not belong to the user
+        if (doc.data().uid === uid) return;
+        return doc.data().fcmToken;
+      });
 
       if (tokens.length === 0) {
         console.log("No tokens available. Event will not be saved.");

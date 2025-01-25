@@ -2,7 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-Future<UserCredential?> signInWithFirebase() async {
+Future<User?> checkAuthStatus() async {
+  final user = FirebaseAuth.instance.currentUser;
+
+  return user ?? await signInWithFirebase();
+}
+
+Future<User?> signInWithFirebase() async {
   try {
     final webClientId = dotenv.env['FIREBASE_WEB_CLIENT_ID'];
 
@@ -50,11 +56,17 @@ Future<UserCredential?> signInWithFirebase() async {
 
     print('Signed in with Firebase as $userCredential');
     // Return the signed-in user
-    return userCredential;
+    return user;
   } catch (e) {
     print('Error signing in with Google: $e');
     return null;
   }
+}
+
+Future<void> setupAuthPersistence() async {
+  print('does this work');
+  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+  print('does this work????');
 }
 
 void listenToAuthState() {

@@ -13,6 +13,7 @@ Future<void> main() async {
   // load env vars
   await dotenv.load();
 
+  // this seems busted...
   // listenToAuthState();
 
   // Initialize Firebase
@@ -20,7 +21,9 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await signInWithFirebase();
+  await setupAuthPersistence();
+
+  await checkAuthStatus();
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hundy_p/firebase/service/messaging_service.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -37,8 +38,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _onHundyPPress() async {
     _controller.forward(from: 0.0);
-    // uploadFcmToken();
-    final result = await FirebaseFunctions.instance.httpsCallable('sendNotification').call();
+    final result = await FirebaseFunctions.instance.httpsCallable('sendNotification').call({
+      'displayName': FirebaseAuth.instance.currentUser!.displayName,
+      'message': 'ugh ugh ugh oh ya',
+    });
     print('Result: ${result.data}');
   }
 

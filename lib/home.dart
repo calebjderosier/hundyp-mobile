@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: ElevatedButton(
               onPressed: _onHundyPPress,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepOrange,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 minimumSize: const Size(200, 200),
                 shape: const CircleBorder(),
                 elevation: 10,

@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               inputText = value;
             },
             decoration: const InputDecoration(
-              hintText: 'Enter a description...',
+              hintText: '(Optional) enter a description...',
             ),
             maxLines: 3,
           ),

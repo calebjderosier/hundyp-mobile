@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/home.dart';
 
 import 'firebase_messaging.dart';
@@ -12,10 +13,14 @@ Future<void> main() async {
   // load env vars
   await dotenv.load();
 
+  listenToAuthState();
+
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await signInWithGoogle();
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();

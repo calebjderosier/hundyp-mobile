@@ -1,7 +1,6 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -13,8 +12,6 @@ Future<void> setupFirebaseMessaging() async {
   // Request notification permissions
   final notificationSettings =
       await FirebaseMessaging.instance.requestPermission(provisional: true);
-
-
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -28,8 +25,7 @@ Future<void> setupFirebaseMessaging() async {
     sound: true,
   );
 
-  print('User granted permission: ${settings.authorizationStatus}');
-
+  print('User granted notification permission: ${settings.authorizationStatus}');
 
   // Get APNS token (for iOS)
   final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
@@ -40,9 +36,8 @@ Future<void> setupFirebaseMessaging() async {
     print('APNS Token is null');
   }
 
-
   final fcmToken = await getFcmToken();
-
+  storeFcmToken('mr sir', fcmToken);
 
   // Listen for token updates
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
@@ -62,12 +57,9 @@ Future<void> setupFirebaseMessaging() async {
     }
   });
 
-
   // Background messaging
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
 }
-
 
 Future<String?> getFcmToken() async {
   // Fetch FCM token, web
@@ -89,16 +81,33 @@ Future<String?> getFcmToken() async {
   }
 }
 
+Future<void> storeFcmToken(String userId, String? token) async {
+  if (token == null) {
+    // todo - this shouldn't ever happen. fix
+    print('Token invalid. Cannot store');
+    return;
+  }
 
-Future<void> storeFcmToken(String userId, String token) async {
   try {
-    final tokensCollection = FirebaseFirestore.instance.collection('fcmTokens');
+    final tokensCollection =
+        FirebaseFirestore.instance.collection('pushNotificationTokens');
 
     // Store or update the token for the user
-    await tokensCollection.doc(userId).set({
-      'fcmToken': token,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    // await tokensCollection.doc(userId).set({
+    //   'fcmToken': token,
+    //   'updatedAt': FieldValue.serverTimestamp(),
+    // });
+
+    final querySnapshot = await tokensCollection.get();
+
+    final docs = querySnapshot.docs.map((doc) {
+      return {
+        'id': doc.id,
+        ...doc.data() as Map<String, dynamic>,
+      };
+    }).toList();
+
+    print(docs.first);
 
     print("FCM Token stored successfully for user: $userId");
   } catch (e) {

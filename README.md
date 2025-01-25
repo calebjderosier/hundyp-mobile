@@ -15,6 +15,21 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+## Secrets
+You're going to need the ones in the `.gitignore` file, e.g.
+```
+.env
+google-services.json
+GoogleService-Info.plist
+```
+## Generating an android SHA-1 for the `google-services.json`
+I ran this command
+```
+keytool -list -v \
+-alias androiddebugkey \
+-keystore ~/.android/debug.keystore
+```
+
 ## Steps to build the first time
 Essentially, follow the tutorial for:
 1. installing flutter
@@ -22,7 +37,6 @@ Essentially, follow the tutorial for:
 
 
 ## Useful flutter .zsh aliases
-
-## FLUTTER
+### FLUTTER
 alias fr='flutter run'
 alias fd='flutter doctor -v'

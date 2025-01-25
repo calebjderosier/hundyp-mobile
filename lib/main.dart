@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/home.dart';
+import 'package:hundy_p/state_handlers/auth_handler.dart';
 
 import 'firebase/service/messaging_service.dart';
 import 'firebase_options.dart';
@@ -23,10 +24,12 @@ Future<void> main() async {
 
   await setupAuthPersistence();
 
-  await checkAuthStatus();
+  final user = await checkAuthStatus();
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();
+
+
 
   runApp(const HundyPApp());
 }
@@ -84,7 +87,7 @@ class HundyPApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       // Automatically switch based on system preference
-      home: const HundyPMain(title: 'Hundy P`d?'),
+      home: const AuthHandler(),
     );
   }
 }
@@ -102,7 +105,7 @@ class _HundyPMainState extends State<HundyPMain> {
   int _selectedTab = 0;
 
   final List _navPages = const [
-    HomePage(title: "Hundy P?"),
+    HomePage(title: "Hundy P"),
     Center(
       child: Text("TODO: Chat Room"),
     ),

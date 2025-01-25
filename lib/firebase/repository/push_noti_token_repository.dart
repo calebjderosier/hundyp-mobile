@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hundy_p/firebase/model/push_noti_token_model.dart';
 
 // Firestore Collection Reference with Converter
@@ -56,10 +55,9 @@ Future<void> updateUserToken(String fcmToken) async {
         tokensCollection.doc(userId);
 
     await tokenDocRef.set(PushNotificationTokenModel(
-      updatedAt: Timestamp.now(),
-      fcmToken: fcmToken,
-      displayName: user.displayName
-    ));
+        updatedAt: Timestamp.now(),
+        fcmToken: fcmToken,
+        displayName: user.displayName ?? 'Distinguished Person'));
     print('FCM Token stored successfully for user: $userId');
   } catch (e) {
     print('Error storing FCM token: $e');

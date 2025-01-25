@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/screens/authenticated_home.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
+import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 
 import 'firebase/service/messaging_service.dart';
 import 'firebase_options.dart';
@@ -28,8 +29,6 @@ Future<void> main() async {
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();
-
-
 
   runApp(const HundyPApp());
 }
@@ -88,6 +87,10 @@ class HundyPApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       // Automatically switch based on system preference
       home: const AuthHandler(),
+      builder: (context, child) {
+        SnackBarHandler().setContext(context); // Initialize SnackBarService
+        return child!;
+      },
     );
   }
 }

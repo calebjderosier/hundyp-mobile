@@ -80,3 +80,8 @@ Future<String?> getFcmToken() async {
     return null;
   }
 }
+
+Future<void> reuploadToken() async {
+  final token = await getFcmToken();
+  await updateUserToken(token);
+}

@@ -60,7 +60,6 @@ Future<void> updateUserToken(String? fcmToken) async {
         tokensCollection.doc(userId);
 
     await tokenDocRef.set(PushNotificationTokenModel(
-      userId: userId,
       updatedAt: Timestamp.now(),
       fcmToken: fcmToken,
     ));

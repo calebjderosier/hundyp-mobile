@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PushNotificationTokenModel {
-  final String userId;
   final Timestamp updatedAt;
   final String fcmToken;
 
   PushNotificationTokenModel({
-    required this.userId,
     required this.updatedAt,
     required this.fcmToken,
   });
@@ -14,7 +12,6 @@ class PushNotificationTokenModel {
   // Factory constructor to create the model from Firestore data
   factory PushNotificationTokenModel.fromFirestore(Map<String, dynamic> data) =>
       PushNotificationTokenModel(
-        userId: data['userId'] as String,
         updatedAt: data['updatedAt'] as Timestamp,
         fcmToken: data['fcmToken'] as String,
       );
@@ -22,7 +19,6 @@ class PushNotificationTokenModel {
   // Converts the model into a Firestore-compatible map
   Map<String, dynamic> toFirestore() {
     return {
-      'userId': userId,
       'updatedAt': updatedAt,
       'fcmToken': fcmToken,
     };
@@ -30,7 +26,7 @@ class PushNotificationTokenModel {
 
   @override
   String toString() {
-    return 'PushNotificationTokenModel(userId: $userId, updatedAt: ${updatedAt.toDate()}, fcmToken: $fcmToken)';
+    return 'PushNotificationTokenModel(updatedAt: ${updatedAt.toDate()}, fcmToken: $fcmToken)';
   }
 }
 

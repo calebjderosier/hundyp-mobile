@@ -55,8 +55,9 @@ Future<User?> signInWithFirebase() async {
       return null;
     }
 
-    print('Signed in with Firebase as $userCredential');
-    // Return the signed-in user
+
+    // Signed in with Firebase
+    // Now just return user
     return user;
   } catch (e) {
     print('Error signing in with Google: $e');

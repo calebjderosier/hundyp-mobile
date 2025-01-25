@@ -13,8 +13,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> setupFirebaseMessaging() async {
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission(
+  // ask for notification permission
+  await FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -23,9 +23,6 @@ Future<void> setupFirebaseMessaging() async {
     provisional: false,
     sound: true,
   );
-
-  print(
-      'User granted notification permission: ${settings.authorizationStatus}');
 
   // Get APNS token (for iOS)
   final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
@@ -74,7 +71,6 @@ Future<String?> getFcmToken() async {
     final fcmToken = await FirebaseMessaging.instance.getToken(
       vapidKey: vapidKey, // Add your VAPID public key for web
     );
-    print("FCM Token: $fcmToken");
     return fcmToken;
   } catch (e) {
     print("Error fetching FCM token: $e");

@@ -69,8 +69,20 @@ exports.sendNotification = onCall(
       try {
         // Send a notification to all tokens
         const response = await messaging().sendEachForMulticast({
-          ...pushNotificationMessage,
           tokens,
+          ...pushNotificationMessage,
+          // Define Android-specific notification options
+          // todo, issues https://github.com/calebjderosier/hundyp-mobile/issues/29 and 28
+          android: {
+            priority: "high", // Required for heads-up notifications
+            notification: {
+              ...pushNotificationMessage.notification,
+              channelId: "high_priority_channel", // Match the channel ID created in the app
+              sound: "default", // Default notification sound
+              priority: "high", // Ensure visibility for heads-up notifications
+              visibility: "public", // Ensure it's visible on the lock screen
+            },
+          },
         });
 
         console.log("Notifications sent:", response);

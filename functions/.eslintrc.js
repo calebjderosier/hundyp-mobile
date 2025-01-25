@@ -21,14 +21,13 @@ module.exports = {
     "/lib/**/*", // Ignore built files.
     "/generated/**/*", // Ignore generated files.
   ],
-  plugins: [
-    "@typescript-eslint",
-    "import",
-  ],
+  plugins: ["@typescript-eslint", "import"],
   rules: {
+    // prettier-ignore
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
+    // prettier-ignore
     "indent": ["error", 2],
-    "object-curly-spacing": 0
+    "object-curly-spacing": 0,
   },
 };

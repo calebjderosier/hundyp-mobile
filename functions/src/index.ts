@@ -14,13 +14,16 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-import functions from "firebase-functions";
-import admin from "firebase-admin";
+import { onCall } from "firebase-functions/v2/https";
+import { firestore, messaging } from "firebase-admin";
+import { initializeApp } from "firebase-admin/app";
 
-admin.initializeApp();
+initializeApp();
 
 // Example function to send notifications
-exports.sendNotification = functions.https.onCall(async (data, context) => {
+// todo - fix once we have a proper way to send notifications
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+exports.sendNotification = onCall(async (data, context) => {
   const message = {
     notification: {
       title: "Hundy P Alert",
@@ -30,8 +33,7 @@ exports.sendNotification = functions.https.onCall(async (data, context) => {
 
   try {
     // Get all tokens from Firestore collection
-    const tokensSnapshot = await admin
-      .firestore()
+    const tokensSnapshot = await firestore()
       .collection("pushNotificationTokens")
       .get();
     const tokens = tokensSnapshot.docs.map((doc) => doc.data().fcmToken);
@@ -42,9 +44,10 @@ exports.sendNotification = functions.https.onCall(async (data, context) => {
     }
 
     // Send a notification to all tokens
-    const response = await admin
-      .messaging()
-      .sendEachForMulticast({ ...message, tokens });
+    const response = await messaging().sendEachForMulticast({
+      ...message,
+      tokens,
+    });
 
     console.log("Notifications sent:", response);
     return { success: true, message: "Notifications sent successfully." };

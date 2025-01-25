@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "firebase-tools": "^13.29.2"
+  },
+  "scripts": {
+    "deploy-functions": "firebase deploy --only functions"
   }
 }

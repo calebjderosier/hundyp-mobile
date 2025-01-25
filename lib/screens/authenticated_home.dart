@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hundy_p/firebase/service/messaging_service.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -36,7 +37,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _onHundyPPress() async {
     _controller.forward(from: 0.0);
-    uploadFcmToken();
+    // uploadFcmToken();
+    final result = await FirebaseFunctions.instance.httpsCallable('sendNotification').call();
+    print('Result: ${result.data}');
   }
 
   @override

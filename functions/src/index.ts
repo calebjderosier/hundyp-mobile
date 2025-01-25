@@ -27,7 +27,7 @@ exports.sendNotification = onCall(async (data, context) => {
   const message = {
     notification: {
       title: "Hundy P Alert",
-      body: "Oh, I'm fucking coming!",
+      body: "Oh, I'm fucking cumming!",
     },
   };
 

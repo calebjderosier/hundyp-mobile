@@ -66,22 +66,28 @@ Future<GoogleSignInAccount?> signInWithGoogleAndFetchPeopleData() async {
           "Web Client ID for Google Auth cannot be empty. Set it in your .env file.");
     }
 
-    // Trigger the Google Sign-In flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn(
+    final GoogleSignIn googleSignIn = GoogleSignIn(
       clientId: webClientId,
       scopes: [
         'email',
         'https://www.googleapis.com/auth/userinfo.profile',
-        // Required for People API
       ],
-    ).signIn();
+    );
+
+    // Check if a user is already signed in
+    GoogleSignInAccount? googleUser = googleSignIn.currentUser;
 
     if (googleUser == null) {
-      print('User canceled sign-in.');
-      return null;
-    }
-    print('got user $googleUser');
+      // If not signed in, trigger the sign-in flow
+      googleUser = await googleSignIn.signIn();
 
+      if (googleUser == null) {
+        print('User canceled sign-in.');
+        return null;
+      }
+    }
+
+    print('got user $googleUser');
     return googleUser;
   } catch (e) {
     print('Error signing in with Google or fetching People API data: $e');

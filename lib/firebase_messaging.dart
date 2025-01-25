@@ -4,6 +4,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'firebase/push_noti_token_service.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
@@ -90,7 +92,6 @@ Future<void> storeFcmToken(String? token) async {
   }
 
   try {
-
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
@@ -100,19 +101,7 @@ Future<void> storeFcmToken(String? token) async {
 
     final userId = user.uid;
 
-    final tokensCollection =
-    FirebaseFirestore.instance.collection('pushNotificationTokens');
-
-    final querySnapshot = await tokensCollection.get();
-    final docs = querySnapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
-      };
-    }).toList();
-
-    print('PRINTING DOCS');
-    print(docs.first);
+    final docs = await fetchAllUserTokens();
 
     // // Reference to the user's document in Firestore
     // final tokenDocRef = FirebaseFirestore.instance

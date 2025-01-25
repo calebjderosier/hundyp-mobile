@@ -41,17 +41,13 @@ Future<List<PushNotificationTokenDocument>?> fetchAllUserTokens() async {
   }
 }
 
-Future<void> updateUserToken(String? fcmToken) async {
+Future<void> updateUserToken(String fcmToken) async {
   try {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       print('No authenticated user. Cannot store FCM token');
       return;
-    }
-    if (fcmToken == null) {
-      // todo - cleanup, throw earlier.
-      throw FlutterError("fcmToken cannot be null. Ever");
     }
 
     final userId = user.uid;

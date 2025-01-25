@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../repository/push_noti_token_repository.dart';
@@ -13,7 +13,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> setupFirebaseMessaging() async {
   // Request notification permissions
   final notificationSettings =
-      await FirebaseMessaging.instance.requestPermission(provisional: true);
+  await FirebaseMessaging.instance.requestPermission(provisional: true);
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -40,9 +40,8 @@ Future<void> setupFirebaseMessaging() async {
   }
 
   // Listen for token updates
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-    print('New FCM Token: $newToken');
-    // Send the new token to your server, if necessary
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    await updateUserToken(newToken);
   }).onError((err) {
     print('Error refreshing FCM token: $err');
   });
@@ -77,11 +76,16 @@ Future<String?> getFcmToken() async {
     return fcmToken;
   } catch (e) {
     print("Error fetching FCM token: $e");
-    return null;
   }
 }
 
 Future<void> reuploadToken() async {
   final token = await getFcmToken();
+  if (token == null) {
+    const message = 'Error!! Not good';
+    print(message);
+    throw FlutterError(message);
+  }
+
   await updateUserToken(token);
 }

@@ -13,14 +13,16 @@ Future<void> main() async {
   // load env vars
   await dotenv.load();
 
-  listenToAuthState();
+  // listenToAuthState();
 
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await signInWithGoogle();
+  // todo - prolly better
+  // await signInWithGoogle();
+  await signInWithGoogleAndFetchPeopleData();
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();

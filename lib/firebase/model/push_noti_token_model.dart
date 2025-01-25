@@ -15,9 +15,18 @@ class PushNotificationTokenModel {
   factory PushNotificationTokenModel.fromFirestore(Map<String, dynamic> data) =>
       PushNotificationTokenModel(
         userId: data['userId'] as String,
-        updatedAt: (data['updatedAt'] as Timestamp),
+        updatedAt: data['updatedAt'] as Timestamp,
         fcmToken: data['fcmToken'] as String,
       );
+
+  // Converts the model into a Firestore-compatible map
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'updatedAt': updatedAt,
+      'fcmToken': fcmToken,
+    };
+  }
 
   @override
   String toString() {
@@ -26,9 +35,8 @@ class PushNotificationTokenModel {
 }
 
 class PushNotificationTokenDocument {
-  final String documentId; // Document ID, to access the data
-  final PushNotificationTokenModel
-      data; // The data associated with the document
+  final String documentId; // Firestore document ID
+  final PushNotificationTokenModel data; // Associated data model
 
   PushNotificationTokenDocument({
     required this.documentId,
@@ -36,13 +44,10 @@ class PushNotificationTokenDocument {
   });
 
   // Factory constructor to create the document model from Firestore
-  factory PushNotificationTokenDocument.fromFirestore(
-      QueryDocumentSnapshot doc) {
+  factory PushNotificationTokenDocument.fromFirestore(QueryDocumentSnapshot doc) {
     return PushNotificationTokenDocument(
-      documentId: doc.id, // Firestore document ID
-      data: PushNotificationTokenModel.fromFirestore(
-        doc.data() as Map<String, dynamic>,
-      ),
+      documentId: doc.id,
+      data: PushNotificationTokenModel.fromFirestore(doc.data() as Map<String, dynamic>),
     );
   }
 

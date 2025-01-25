@@ -39,9 +39,6 @@ Future<void> setupFirebaseMessaging() async {
     print('APNS Token is null');
   }
 
-  final fcmToken = await getFcmToken();
-  storeFcmToken(fcmToken);
-
   // Listen for token updates
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
     print('New FCM Token: $newToken');
@@ -81,41 +78,5 @@ Future<String?> getFcmToken() async {
   } catch (e) {
     print("Error fetching FCM token: $e");
     return null;
-  }
-}
-
-Future<void> storeFcmToken(String? token) async {
-  if (token == null) {
-    print('Token invalid. Cannot store.');
-    return;
-  }
-
-  try {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      print('No authenticated user. Cannot store FCM token');
-      return;
-    }
-
-    final userId = user.uid;
-
-    final docs = await fetchAllUserTokens();
-
-    // // Reference to the user's document in Firestore
-    // final tokenDocRef = FirebaseFirestore.instance
-    //     .collection('pushNotificationTokens')
-    //     .doc(userId);
-    //
-    // // Write or update the token
-    // await tokenDocRef.set({
-    //   'userId': userId,
-    //   'fcmToken': token,
-    //   'updatedAt': FieldValue.serverTimestamp(),
-    // });
-
-    print('FCM Token stored successfully for user: $userId');
-  } catch (e) {
-    print('Error storing FCM token: $e');
   }
 }

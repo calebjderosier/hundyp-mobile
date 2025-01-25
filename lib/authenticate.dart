@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-Future<User?> signInWithGoogle() async {
+Future<User?> signInWithFirebase() async {
   try {
     final webClientId = dotenv.env['GOOGLE_CLOUD_WEB_CLIENT_ID'];
 
@@ -36,11 +34,17 @@ Future<User?> signInWithGoogle() async {
     );
     print('credential $credential');
 
-    // Sign in to Firebase with the Google user credentials
+    // Authenticate with Firebase
     final UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
+    await FirebaseAuth.instance.signInWithCredential(credential);
 
-    print('userCredential.user $userCredential');
+    final user = userCredential.user;
+    if (user == null) {
+      print('Firebase sign-in failed.');
+      return null;
+    }
+
+    print('Signed in with Firebase as $userCredential');
     // Return the signed-in user
     return userCredential.user;
   } catch (e) {
@@ -50,7 +54,7 @@ Future<User?> signInWithGoogle() async {
 }
 
 
-Future<void> signInWithGoogleAndFetchPeopleData() async {
+Future<GoogleSignInAccount?> signInWithGoogleAndFetchPeopleData() async {
   try {
     final webClientId = dotenv.env['GOOGLE_CLOUD_WEB_CLIENT_ID'];
 
@@ -70,34 +74,15 @@ Future<void> signInWithGoogleAndFetchPeopleData() async {
 
     if (googleUser == null) {
       print('User canceled sign-in.');
-      return;
+      return null;
     }
+    print('got user $googleUser');
 
-    // Obtain authentication details
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-    // Use the access token to fetch People API data
-    final accessToken = googleAuth.accessToken;
-    if (accessToken != null) {
-      final response = await http.get(
-        Uri.parse(
-            'https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        print('User data: $data');
-      } else {
-        print('Failed to fetch user data. Status code: ${response.statusCode}');
-      }
-    } else {
-      print('Access token is null.');
-    }
+    return googleUser;
   } catch (e) {
     print('Error signing in with Google or fetching People API data: $e');
+    return null;
   }
 }
 

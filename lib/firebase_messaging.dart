@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -37,7 +38,7 @@ Future<void> setupFirebaseMessaging() async {
   }
 
   final fcmToken = await getFcmToken();
-  storeFcmToken('mr sir', fcmToken);
+  storeFcmToken(fcmToken);
 
   // Listen for token updates
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
@@ -81,25 +82,26 @@ Future<String?> getFcmToken() async {
   }
 }
 
-Future<void> storeFcmToken(String userId, String? token) async {
+Future<void> storeFcmToken(String? token) async {
   if (token == null) {
-    // todo - this shouldn't ever happen. fix
-    print('Token invalid. Cannot store');
+    print('Token invalid. Cannot store.');
     return;
   }
 
   try {
-    final tokensCollection =
-        FirebaseFirestore.instance.collection('pushNotificationTokens');
+    final user = FirebaseAuth.instance.currentUser;
 
-    // Store or update the token for the user
-    // await tokensCollection.doc(userId).set({
-    //   'fcmToken': token,
-    //   'updatedAt': FieldValue.serverTimestamp(),
-    // });
+    if (user == null) {
+      print('No authenticated user. Cannot store FCM token');
+      return;
+    }
+
+    final userId = user.uid;
+
+    final tokensCollection =
+    FirebaseFirestore.instance.collection('pushNotificationTokens');
 
     final querySnapshot = await tokensCollection.get();
-
     final docs = querySnapshot.docs.map((doc) {
       return {
         'id': doc.id,
@@ -109,8 +111,20 @@ Future<void> storeFcmToken(String userId, String? token) async {
 
     print(docs.first);
 
-    print("FCM Token stored successfully for user: $userId");
+    // // Reference to the user's document in Firestore
+    // final tokenDocRef = FirebaseFirestore.instance
+    //     .collection('pushNotificationTokens')
+    //     .doc(userId);
+    //
+    // // Write or update the token
+    // await tokenDocRef.set({
+    //   'userId': userId,
+    //   'fcmToken': token,
+    //   'updatedAt': FieldValue.serverTimestamp(),
+    // });
+
+    print('FCM Token stored successfully for user: $userId');
   } catch (e) {
-    print("Error storing FCM token: $e");
+    print('Error storing FCM token: $e');
   }
 }

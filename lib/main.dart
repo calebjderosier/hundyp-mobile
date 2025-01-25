@@ -20,9 +20,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // todo - prolly better
-  // await signInWithGoogle();
   await signInWithGoogleAndFetchPeopleData();
+  // await signInWithFirebase();
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();

@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _controller.forward(from: 0.0);
 
     final fcmToken = await getFcmToken();
-    storeFcmToken('mr sir', fcmToken);
+    storeFcmToken(fcmToken);
   }
 
   @override

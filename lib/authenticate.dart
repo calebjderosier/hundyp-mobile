@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -64,9 +65,11 @@ Future<User?> signInWithFirebase() async {
 }
 
 Future<void> setupAuthPersistence() async {
-  print('does this work');
-  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
-  print('does this work????');
+  if (kIsWeb) {
+    await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+  } else {
+    print('Persistence is not supported on iOS/Android. Skipping...');
+  }
 }
 
 void listenToAuthState() {

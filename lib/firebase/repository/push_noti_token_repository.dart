@@ -20,8 +20,6 @@ Future<List<PushNotificationTokenDocument>?> fetchAllUserTokens() async {
       return null;
     }
 
-    final userId = user.uid;
-
     final tokensCollection =
         FirebaseFirestore.instance.collection('pushNotificationTokens');
 

@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _onHundyPPress() async {
     _controller.forward(from: 0.0);
-    reuploadToken();
+    uploadFcmToken();
   }
 
   @override

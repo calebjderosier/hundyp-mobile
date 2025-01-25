@@ -39,6 +39,8 @@ Future<void> setupFirebaseMessaging() async {
     print('APNS Token is null');
   }
 
+  await uploadFcmToken();
+
   // Listen for token updates
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
     await updateUserToken(newToken);
@@ -79,7 +81,7 @@ Future<String?> getFcmToken() async {
   }
 }
 
-Future<void> reuploadToken() async {
+Future<void> uploadFcmToken() async {
   final token = await getFcmToken();
   if (token == null) {
     const message = 'Error!! Not good';

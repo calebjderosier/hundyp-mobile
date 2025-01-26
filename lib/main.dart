@@ -1,24 +1,15 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/screens/authenticated_home.dart';
 import 'package:hundy_p/screens/chat_room.dart';
 import 'package:hundy_p/screens/error_screen.dart';
+import 'package:hundy_p/screens/initialization_screen.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
 import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 
-import 'firebase/service/messaging_service.dart';
-import 'firebase_options.dart';
-
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   FlutterError.onError = (FlutterErrorDetails details) {
-    // Log the error to console or a monitoring tool
-    print('Caught Flutter Error: ${details.exception}');
-    print('Stack Trace: ${details.stack}');
-
     // Redirect to the Error Screen
     runApp(ErrorScreen(
       errorMessage: details.exceptionAsString(),
@@ -26,25 +17,8 @@ Future<void> main() async {
     ));
   };
 
-  // load env vars
-  await dotenv.load(fileName: 'dotenv');
-
-  // this seems busted...
-  // listenToAuthState();
-
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  await setupAuthPersistence();
-
-  final user = await checkAuthStatus();
-
-  // Setup Firebase Messaging
-  await setupFirebaseMessaging();
-
-  runApp(const HundyPApp());
+  // Start the app with the loading flow
+  runApp(const InitializationApp());
 }
 
 class HundyPApp extends StatelessWidget {

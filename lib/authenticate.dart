@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,16 +20,34 @@ Future<User?> signInWithFirebase() async {
     }
 
     // Trigger the Google Sign-In flow
-    final GoogleSignInAccount? googleSignIn = await GoogleSignIn(
-      clientId: webClientId,
-      scopes: [
+    var scopes = [
         'email',
         'https://www.googleapis.com/auth/userinfo.profile',
         // Required for People API
-      ],
-    ).signIn();
+      ];
+    final GoogleSignIn googleSignIn = await GoogleSignIn(
+      clientId: webClientId,
+      scopes: scopes,
+    );
 
-    if (googleSignIn == null) {
+    GoogleSignInAccount? account;
+
+    // native only
+    // if (!kIsWeb) {
+      account = await googleSignIn.signInSilently();
+    // }
+    bool isAuthorized = account != null;
+
+    if (kIsWeb && account != null) {
+      isAuthorized = await googleSignIn.canAccessScopes(scopes);
+    }
+
+    if (kIsWeb && !isAuthorized){
+      print('should fail');
+      await googleSignIn.requestScopes(scopes);
+    }
+
+    if (account == null) {
       // The user canceled the sign-in
       print('cancelled sign in');
       return null;
@@ -36,7 +55,7 @@ Future<User?> signInWithFirebase() async {
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth =
-        await googleSignIn.authentication;
+        await account.authentication;
 
     // Create a new credential
     final OAuthCredential credential = GoogleAuthProvider.credential(
@@ -54,9 +73,16 @@ Future<User?> signInWithFirebase() async {
       print('Firebase sign-in failed.');
       return null;
     }
-
+    // However, on web...
+    if (kIsWeb) {
+      isAuthorized = await googleSignIn.canAccessScopes(scopes);
+    }
 
     // Signed in with Firebase
+    FirebaseAnalytics.instance.logEvent(name: "test", parameters: {
+      "great": "success",
+    });
+
     // Now just return user
     return user;
   } catch (e) {

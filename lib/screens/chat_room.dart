@@ -22,7 +22,6 @@ class ChatRoomPage extends StatelessWidget {
           onPressed: () {
             SnackBarHandler().showSnackBar(
               message: 'Omfg someone just hundy p\'d I shan\'t believe it holy fuck did it actually just happen omg',
-              duration: const Duration(seconds: 4),
             );
           },
           style: ElevatedButton.styleFrom(

@@ -27,10 +27,10 @@ class SnackBarHandler {
     }
 
     // Rule of thumb for showing a snackbar is 1 second for every
-    // ~5-6 characters, with a minimum of 2 seconds and a maximum of 15 seconds.
+    // ~10-12 characters, with a minimum of 2 seconds and a maximum of 10 seconds.
     final defaultDuration = providedDuration ??
         Duration(
-          seconds: (message.length / 5).ceil().clamp(2, 15),
+          seconds: (message.length / 10).ceil().clamp(2, 10),
         );
 
     ScaffoldMessenger.of(_context).showSnackBar(

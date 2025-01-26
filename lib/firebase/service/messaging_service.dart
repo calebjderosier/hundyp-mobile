@@ -64,7 +64,7 @@ Future<String?> getFcmToken() async {
   final vapidKey = dotenv.env['FIREBASE_VAPID_KEY'];
 
   if (vapidKey == null || vapidKey.isEmpty) {
-    throw Exception("Valid key cannot be empty, please set as an env variable");
+    throw Exception("Vapid key cannot be empty, please set as an env variable");
   }
 
   try {

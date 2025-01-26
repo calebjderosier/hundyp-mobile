@@ -1,4 +1,3 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -18,6 +17,8 @@ class InitializationApp extends StatefulWidget {
 class InitializationAppState extends State<InitializationApp> {
   String _loadingMessage = 'Starting up...';
   bool _hasError = false;
+  String? _errorMessage;
+  String? _stackTrace;
 
   @override
   void initState() {
@@ -31,7 +32,8 @@ class InitializationAppState extends State<InitializationApp> {
       await dotenv.load(fileName: 'dotenv');
 
       setState(() => _loadingMessage = 'Initializing Backend...');
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
 
       setState(() => _loadingMessage = 'Authenticating...');
       await setupAuthPersistence();
@@ -44,17 +46,21 @@ class InitializationAppState extends State<InitializationApp> {
     } catch (e, stackTrace) {
       print('Error during initialization: $e');
       print('Stack trace: $stackTrace');
-      setState(() => _hasError = true);
+      setState(() {
+        _hasError = true;
+        _errorMessage = e.toString();
+        _stackTrace = stackTrace.toString();
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_hasError) {
-      return const MaterialApp(
+      return MaterialApp(
         home: ErrorScreen(
-          errorMessage: 'An error occurred during initialization.',
-          stackTrace: '',
+          errorMessage: _errorMessage ?? 'An error occurred.',
+          stackTrace: _stackTrace ?? 'No stack trace available.',
         ),
       );
     }

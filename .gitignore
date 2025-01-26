@@ -48,8 +48,9 @@ android/build
 
 # Build files
 node_modules
+.firebase
 
 # Secret files
-.env
+dotenv
 google-services.json
 GoogleService-Info.plist

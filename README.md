@@ -18,7 +18,7 @@ samples, guidance on mobile development, and a full API reference.
 ## Secrets
 You're going to need the ones in the `.gitignore` file, e.g.
 ```
-.env
+dotenv
 google-services.json
 GoogleService-Info.plist
 ```

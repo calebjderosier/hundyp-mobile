@@ -3,7 +3,8 @@ name: Deploy to Firebase Hosting on Merge
 on:
   push:
     branches:
-       - main
+#       - main
+# todo need env vars on github
 
 jobs:
   build_and_deploy:

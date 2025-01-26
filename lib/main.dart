@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/screens/authenticated_home.dart';
 import 'package:hundy_p/screens/chat_room.dart';
+import 'package:hundy_p/screens/error_screen.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
 import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 
@@ -13,8 +14,20 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  FlutterError.onError = (FlutterErrorDetails details) {
+    // Log the error to console or a monitoring tool
+    print('Caught Flutter Error: ${details.exception}');
+    print('Stack Trace: ${details.stack}');
+
+    // Redirect to the Error Screen
+    runApp(ErrorScreen(
+      errorMessage: details.exceptionAsString(),
+      stackTrace: details.stack.toString(),
+    ));
+  };
+
   // load env vars
-  await dotenv.load();
+  await dotenv.load(fileName: 'dotenv');
 
   // this seems busted...
   // listenToAuthState();

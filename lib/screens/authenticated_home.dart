@@ -82,7 +82,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           .call({
         'displayName': FirebaseAuth.instance.currentUser!.displayName,
         'message': description,
-        'uid': FirebaseAuth.instance.currentUser!.uid
+        'uid': FirebaseAuth.instance.currentUser!.uid,
+        // only temporary, just to restrict who has access to the app
+        'email': FirebaseAuth.instance.currentUser!.email,
       });
       print('Result: ${result.data}');
     } catch (e) {

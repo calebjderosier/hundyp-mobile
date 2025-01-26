@@ -2,7 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
-import 'package:hundy_p/home.dart';
+import 'package:hundy_p/screens/authenticated_home.dart';
+import 'package:hundy_p/screens/chat_room.dart';
+import 'package:hundy_p/state_handlers/auth_handler.dart';
+import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 
 import 'firebase/service/messaging_service.dart';
 import 'firebase_options.dart';
@@ -23,7 +26,7 @@ Future<void> main() async {
 
   await setupAuthPersistence();
 
-  await checkAuthStatus();
+  final user = await checkAuthStatus();
 
   // Setup Firebase Messaging
   await setupFirebaseMessaging();
@@ -82,9 +85,13 @@ class HundyPApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       // Automatically switch based on system preference
-      home: const HundyPMain(title: 'Hundy P`d?'),
+      home: const AuthHandler(),
+      builder: (context, child) {
+        SnackBarHandler().setContext(context); // Initialize SnackBarService
+        return child!;
+      },
     );
   }
 }
@@ -102,10 +109,8 @@ class _HundyPMainState extends State<HundyPMain> {
   int _selectedTab = 0;
 
   final List _navPages = const [
-    HomePage(title: "Hundy P?"),
-    Center(
-      child: Text("TODO: Chat Room"),
-    ),
+    HomePage(title: "Hundy P"),
+    ChatRoomPage(),
     Center(
       child: Text("TODO: Ledger"),
     ),

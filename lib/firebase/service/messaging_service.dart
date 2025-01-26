@@ -1,6 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 
 import '../repository/push_noti_token_repository.dart';
 
@@ -11,13 +13,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> setupFirebaseMessaging() async {
-  // Request notification permissions
-  final notificationSettings =
-  await FirebaseMessaging.instance.requestPermission(provisional: true);
-
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  NotificationSettings settings = await messaging.requestPermission(
+  // ask for notification permission
+  await FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -26,9 +23,6 @@ Future<void> setupFirebaseMessaging() async {
     provisional: false,
     sound: true,
   );
-
-  print(
-      'User granted notification permission: ${settings.authorizationStatus}');
 
   // Get APNS token (for iOS)
   final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
@@ -51,10 +45,13 @@ Future<void> setupFirebaseMessaging() async {
   // Foreground messaging
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
 
     if (message.notification != null) {
       print('Message also contained a notification: ${message.notification}');
+      SnackBarHandler().showSnackBar(
+        message:
+            '${message.notification!.title}: ${message.notification!.body}',
+      );
     }
   });
 
@@ -74,7 +71,6 @@ Future<String?> getFcmToken() async {
     final fcmToken = await FirebaseMessaging.instance.getToken(
       vapidKey: vapidKey, // Add your VAPID public key for web
     );
-    print("FCM Token: $fcmToken");
     return fcmToken;
   } catch (e) {
     print("Error fetching FCM token: $e");

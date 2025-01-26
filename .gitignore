@@ -44,6 +44,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+android/build
 
-# Env file
+# Build files
+node_modules
+
+# Secret files
 .env
+google-services.json
+GoogleService-Info.plist

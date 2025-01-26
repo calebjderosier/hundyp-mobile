@@ -1,0 +1,45 @@
+name: Deploy to Firebase Hosting on PR
+
+# todo need env vars on github
+#on: pull_request
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  build_and_preview:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml # path to pubspec.yaml
+          ## todo does this work??
+
+      - name: Peep the version
+        run: flutter --version
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Step 4: Build the Flutter web app
+      - name: Build Flutter web app
+        run: flutter build web
+
+      # Step 5: Deploy to Firebase Hosting preview channel
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HUNDYP_FLUTTER }}
+          projectId: hundyp-flutter

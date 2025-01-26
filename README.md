@@ -40,3 +40,7 @@ Essentially, follow the tutorial for:
 ### FLUTTER
 alias fr='flutter run'
 alias fd='flutter doctor -v'
+
+## iOS todo
+* Allow push notifications
+* Confirm hooking up of google analytics

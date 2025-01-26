@@ -49,6 +49,7 @@ android/build
 # Build files
 node_modules
 .firebase
+ios/Runner.xcworkspace*
 
 # Secret files
 dotenv

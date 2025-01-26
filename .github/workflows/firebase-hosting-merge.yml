@@ -3,9 +3,7 @@ name: Deploy to Firebase Hosting on Merge
 on:
   push:
     branches:
-      # - main
-      # Just making sure this never runs until its fixed
-      - should_run_on_main
+       - main
 
 jobs:
   build_and_deploy:

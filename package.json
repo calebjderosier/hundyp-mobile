@@ -3,6 +3,7 @@
     "firebase-tools": "^13.29.2"
   },
   "scripts": {
-    "deploy-functions": "firebase deploy --only functions"
+    "deploy-functions": "firebase deploy --only functions",
+    "deploy-web": "flutter build web && firebase deploy --only hosting"
   }
 }

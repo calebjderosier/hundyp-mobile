@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
+import 'package:hundy_p/firebase/logging/firebase_logging.dart';
 import 'package:hundy_p/firebase/service/messaging_service.dart';
 import 'package:hundy_p/firebase_options.dart';
 import 'package:hundy_p/main.dart';
@@ -35,6 +36,8 @@ class InitializationAppState extends State<InitializationApp> {
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
 
+      setupLogging();
+
       setState(() => _loadingMessage = 'Authenticating...');
       await setupAuthPersistence();
       await checkAuthStatus();
@@ -46,6 +49,9 @@ class InitializationAppState extends State<InitializationApp> {
     } catch (e, stackTrace) {
       print('Error during initialization: $e');
       print('Stack trace: $stackTrace');
+
+      // Log error to Firebase Crashlytics
+      logError(e: e, stackTrace: stackTrace, fatal: true);
       setState(() {
         _hasError = true;
         _errorMessage = e.toString();

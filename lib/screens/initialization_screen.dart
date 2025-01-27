@@ -7,6 +7,7 @@ import 'package:hundy_p/firebase/service/messaging_service.dart';
 import 'package:hundy_p/firebase_options.dart';
 import 'package:hundy_p/main.dart';
 import 'package:hundy_p/screens/error_screen.dart';
+import 'package:hundy_p/state_handlers/google_sign_in_service.dart';
 
 class InitializationApp extends StatefulWidget {
   const InitializationApp({Key? key}) : super(key: key);
@@ -83,6 +84,17 @@ class InitializationAppState extends State<InitializationApp> {
                 _loadingMessage,
                 style: const TextStyle(fontSize: 16),
               ),
+              if (!GoogleSignInService.instance.isAuthorized) ...[
+                const SizedBox(height: 20),
+                const Text('Additional permissions are required.'),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Request additional scopes
+                    await GoogleSignInService.instance.requestScopes();
+                  },
+                  child: const Text('REQUEST PERMISSIONS'),
+                ),
+              ],
             ],
           ),
         ),

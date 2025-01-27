@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hundy_p/state_handlers/google_sign_in_service.dart';
 
 Future<User?> checkAuthStatus() async {
   final user = FirebaseAuth.instance.currentUser;
@@ -21,31 +22,14 @@ Future<User?> signInWithFirebase() async {
 
     // Trigger the Google Sign-In flow
     var scopes = [
-        'email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        // Required for People API
-      ];
-    final GoogleSignIn googleSignIn = await GoogleSignIn(
-      clientId: webClientId,
-      scopes: scopes,
-    );
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      // Required for People API
+    ];
 
-    GoogleSignInAccount? account;
+    final googleSignIn = GoogleSignInService.instance.googleSignIn;
 
-    // native only
-    // if (!kIsWeb) {
-      account = await googleSignIn.signInSilently();
-    // }
-    bool isAuthorized = account != null;
-
-    if (kIsWeb && account != null) {
-      isAuthorized = await googleSignIn.canAccessScopes(scopes);
-    }
-
-    if (kIsWeb && !isAuthorized){
-      print('should fail');
-      await googleSignIn.requestScopes(scopes);
-    }
+    GoogleSignInAccount? account = await googleSignIn.signInSilently();
 
     if (account == null) {
       // The user canceled the sign-in
@@ -54,8 +38,7 @@ Future<User?> signInWithFirebase() async {
     }
 
     // Obtain the auth details from the request
-    final GoogleSignInAuthentication googleAuth =
-        await account.authentication;
+    final GoogleSignInAuthentication googleAuth = await account.authentication;
 
     // Create a new credential
     final OAuthCredential credential = GoogleAuthProvider.credential(
@@ -73,11 +56,6 @@ Future<User?> signInWithFirebase() async {
       print('Firebase sign-in failed.');
       return null;
     }
-    // However, on web...
-    if (kIsWeb) {
-      isAuthorized = await googleSignIn.canAccessScopes(scopes);
-    }
-
     // Signed in with Firebase
     FirebaseAnalytics.instance.logEvent(name: "test", parameters: {
       "great": "success",

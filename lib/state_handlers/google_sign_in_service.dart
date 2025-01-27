@@ -15,14 +15,25 @@ class GoogleSignInService {
   // GoogleSignIn instance
   late final GoogleSignIn _googleSignIn;
 
-  // Getter for the GoogleSignIn instance
-  GoogleSignIn get googleSignIn => _googleSignIn;
+  // Scopes for Google Sign-In
   final _scopes = [
     'email',
     'https://www.googleapis.com/auth/userinfo.profile',
   ];
 
+  // Track authorization state
   bool _isAuthorized = false;
+
+  // Track the current user
+  GoogleSignInAccount? _currentUser;
+
+  // Getter for the GoogleSignIn instance
+  GoogleSignIn get googleSignIn => _googleSignIn;
+
+  // Getter for the current user
+  GoogleSignInAccount? get currentUser => _currentUser;
+
+  // Getter for the authorization state
   bool get isAuthorized => _isAuthorized;
 
   // Initialize the GoogleSignIn instance
@@ -34,63 +45,66 @@ class GoogleSignInService {
           "Webclient Key for Google Auth cannot be empty, please set as an env variable");
     }
 
-
     _googleSignIn = GoogleSignIn(
       clientId: webClientId,
       scopes: _scopes,
     );
+
+    // Listen for changes in the current user
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) async {
+      _currentUser = account;
+
+      // Check if the user is authorized (has granted the required scopes)
+      if (kIsWeb && account != null) {
+        _isAuthorized = await _googleSignIn.canAccessScopes(_scopes);
+      } else {
+        _isAuthorized = account != null;
+      }
+    });
+
+    // Attempt silent sign-in
+    _googleSignIn.signInSilently();
   }
 
+  // Prompts the user to authorize additional scopes
+  Future<void> requestScopes() async {
+    if (_currentUser == null) {
+      throw Exception("No user is currently signed in.");
+    }
 
-
-  // Prompts the user to authorize `scopes`.
-  //
-  // This action is **required** in platforms that don't perform Authentication
-  // and Authorization at the same time (like the web).
-  //
-  // On the web, this must be called from an user interaction (button click).
-  // #docregion RequestScopes
-// todo - might need to do this for the ppl api
-  Future<void> _handleAuthorizeScopes() async {
-    print('do we eneda do this');
     final bool isAuthorized = await _googleSignIn.requestScopes(_scopes);
-    // #enddocregion RequestScopes
     _isAuthorized = isAuthorized;
-    // #docregion RequestScopes
+
     if (isAuthorized) {
-      print('isAuthorized $isAuthorized');
+      print("User has authorized the required scopes.");
+    } else {
+      print("User did not authorize the required scopes.");
     }
-      // unawaited(_handleGetContact(_currentUser!));
+  }
+
+  // Sign in the user
+  Future<GoogleSignInAccount?> signIn() async {
+    try {
+      _currentUser = await _googleSignIn.signIn();
+      if (_currentUser != null) {
+        _isAuthorized = await _googleSignIn.canAccessScopes(_scopes);
+      }
+      return _currentUser;
+    } catch (e) {
+      print("Error during sign-in: $e");
+      return null;
     }
-    // #enddocregion RequestScopes
-  //
-  //   Future<void> _handleGetContact(GoogleSignInAccount user) async {
-  //     setState(() {
-  //       _contactText = 'Loading contact info...';
-  //     });
-  //     final http.Response response = await http.get(
-  //       Uri.parse('https://people.googleapis.com/v1/people/me/connections'
-  //           '?requestMask.includeField=person.names'),
-  //       headers: await user.authHeaders,
-  //     );
-  //     if (response.statusCode != 200) {
-  //       setState(() {
-  //         _contactText = 'People API gave a ${response.statusCode} '
-  //             'response. Check logs for details.';
-  //       });
-  //       print('People API ${response.statusCode} response: ${response.body}');
-  //       return;
-  //     }
-  //     final Map<String, dynamic> data =
-  //     json.decode(response.body) as Map<String, dynamic>;
-  //     final String? namedContact = _pickFirstNamedContact(data);
-  //     setState(() {
-  //       if (namedContact != null) {
-  //         _contactText = 'I see you know $namedContact!';
-  //       } else {
-  //         _contactText = 'No contacts to display.';
-  //       }
-  //     });
-  //   }
-  // }
+  }
+
+  // Sign out the user
+  Future<void> signOut() async {
+    try {
+      await _googleSignIn.signOut();
+      _currentUser = null;
+      _isAuthorized = false;
+      print("User signed out successfully.");
+    } catch (e) {
+      print("Error during sign-out: $e");
+    }
+  }
 }

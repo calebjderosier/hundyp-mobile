@@ -4,11 +4,14 @@ import 'package:hundy_p/screens/chat_room.dart';
 import 'package:hundy_p/screens/error_screen.dart';
 import 'package:hundy_p/screens/initialization_screen.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
+import 'package:hundy_p/state_handlers/google_sign_in_service.dart';
 import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  GoogleSignInService.instance.initialize();
 
   FlutterError.onError = (FlutterErrorDetails details) {
     // Redirect to the Error Screen

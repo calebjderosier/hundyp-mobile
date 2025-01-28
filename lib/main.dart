@@ -1,37 +1,26 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/screens/authenticated_home.dart';
 import 'package:hundy_p/screens/chat_room.dart';
+import 'package:hundy_p/screens/error_screen.dart';
+import 'package:hundy_p/screens/initialization_screen.dart';
+import 'package:hundy_p/screens/ledger_screen.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
 import 'package:hundy_p/state_handlers/snackbar_handler.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
-import 'firebase/service/messaging_service.dart';
-import 'firebase_options.dart';
-
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // load env vars
-  await dotenv.load();
+  FlutterError.onError = (FlutterErrorDetails details) {
+    // Redirect to the Error Screen
+    runApp(ErrorScreen(
+      errorMessage: details.exceptionAsString(),
+      stackTrace: details.stack.toString(),
+    ));
+  };
 
-  // this seems busted...
-  // listenToAuthState();
-
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  await setupAuthPersistence();
-
-  final user = await checkAuthStatus();
-
-  // Setup Firebase Messaging
-  await setupFirebaseMessaging();
-
-  runApp(const HundyPApp());
+  // Start the app with the loading flow
+  runApp(const InitializationApp());
 }
 
 class HundyPApp extends StatelessWidget {
@@ -41,6 +30,9 @@ class HundyPApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Hundy P',
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
       theme: ThemeData(
         colorScheme: const ColorScheme(
           brightness: Brightness.light,
@@ -111,9 +103,7 @@ class _HundyPMainState extends State<HundyPMain> {
   final List _navPages = const [
     HomePage(title: "Hundy P"),
     ChatRoomPage(),
-    Center(
-      child: Text("TODO: Ledger"),
-    ),
+    LedgerScreen(),
   ];
 
   void _changeTab(int index) {

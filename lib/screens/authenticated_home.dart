@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -82,8 +83,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           .call({
         'displayName': FirebaseAuth.instance.currentUser!.displayName,
         'message': description,
-        'uid': FirebaseAuth.instance.currentUser!.uid
+        'uid': FirebaseAuth.instance.currentUser!.uid,
+        // only temporary, just to restrict who has access to the app
+        'email': FirebaseAuth.instance.currentUser!.email,
       });
+
+      // Success toast
+      SnackBarHandler().showSnackBar(
+        message: 'Notification sent successfully! 🎉',
+      );
       print('Result: ${result.data}');
     } catch (e) {
       print('Error sending notification: $e');

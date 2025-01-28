@@ -18,7 +18,7 @@ samples, guidance on mobile development, and a full API reference.
 ## Secrets
 You're going to need the ones in the `.gitignore` file, e.g.
 ```
-.env
+dotenv
 google-services.json
 GoogleService-Info.plist
 ```
@@ -40,3 +40,7 @@ Essentially, follow the tutorial for:
 ### FLUTTER
 alias fr='flutter run'
 alias fd='flutter doctor -v'
+
+## iOS todo
+* Allow push notifications
+* Confirm hooking up of google analytics

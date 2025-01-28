@@ -5,7 +5,12 @@ import { initializeApp } from "firebase-admin/app";
 initializeApp();
 
 // Example function to send notifications
-type RequestBody = { displayName: string; message: string; uid: string };
+type RequestBody = {
+  displayName: string;
+  message: string;
+  uid: string;
+  email: string;
+};
 
 // todo - replace w/ a DB call to get a random message
 const generateRandomMessage = (displayName: string) => {
@@ -20,7 +25,7 @@ const generateRandomMessage = (displayName: string) => {
 // Cloud Function to send notifications and save event to Firestore
 exports.sendNotification = onCall(
   async ({
-    data: { displayName, message, uid },
+    data: { displayName, message, uid, email },
   }: CallableRequest<RequestBody>) => {
     const missingFields = [];
     if (!uid) missingFields.push("uid");
@@ -42,10 +47,22 @@ exports.sendNotification = onCall(
     };
 
     try {
+      // Check if the user email exists in the `validUsers` collection
+      const validUserDoc = await firestore()
+        .collection("validBetaUsers")
+        .doc(email)
+        .get();
+
+      if (!validUserDoc.exists || !validUserDoc.data()?.isActive) {
+        console.error(`User ${email} is not authorized.`);
+        return { success: false, message: "User not authorized" };
+      }
+
       // Get all tokens from Firestore collection
       const tokensSnapshot = await firestore()
         .collection("pushNotificationTokens")
         .get();
+
       const tokens: string[] = tokensSnapshot.docs.map((doc) => {
         // only return those which do not belong to the user
         if (doc.data().uid === uid) return;

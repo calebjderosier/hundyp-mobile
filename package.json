@@ -4,6 +4,7 @@
   },
   "scripts": {
     "deploy-functions": "firebase deploy --only functions",
-    "deploy-web": "flutter build web && firebase deploy --only hosting"
+    "deploy-web": "flutter build web && firebase deploy --only hosting",
+    "run-web": "flutter run -d chrome --web-hostname localhost --web-port 7357"
   }
 }

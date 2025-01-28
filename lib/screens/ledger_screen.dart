@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hundy_p/firebase/service/messaging_service.dart';
 
 class LedgerScreen extends StatelessWidget {
   const LedgerScreen({super.key});
@@ -25,6 +26,10 @@ class LedgerScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
+              'Version 0.69.1',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            Text(
               'Current User Details:',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
@@ -40,6 +45,7 @@ class LedgerScreen extends StatelessWidget {
             Text(
               'Photo URL: ${currentUser.photoURL ?? "No photo URL available"}',
             ),
+            Text('Notification status: ${getNotificationPermission()}')
           ],
         )
             : Center(

@@ -1,10 +1,10 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:hundy_p/state_handlers/snackbar_handler.dart';
+import 'dart:html' as html;
 
-import '../repository/push_noti_token_repository.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hundy_p/firebase/repository/push_noti_token_repository.dart';
+import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -74,16 +74,54 @@ Future<String?> getFcmToken() async {
     return fcmToken;
   } catch (e) {
     print("Error fetching FCM token: $e");
+    return null;
   }
 }
 
 Future<void> uploadFcmToken() async {
   final token = await getFcmToken();
   if (token == null) {
-    const message = 'Error!! Not good';
+    const message = 'Failed to get token! Prompt for user permissions';
     print(message);
     throw FlutterError(message);
   }
 
   await updateUserToken(token);
+}
+
+// Define an enum to represent the notification permission status
+enum NotificationPermissionStatus {
+  granted,
+  denied,
+  notGranted,
+}
+
+Future<NotificationPermissionStatus> requestNotificationPermission() async {
+  if (!kIsWeb) return NotificationPermissionStatus.granted;
+
+  // Check the current permission status
+  final permission = html.Notification.permission;
+
+  if (permission == 'granted') {
+    return NotificationPermissionStatus.granted;
+  } else if (permission == 'denied') {
+    return NotificationPermissionStatus.denied;
+  } else {
+    // Prompt the user for permission
+    return await explicitlyRequestNotiPermission();
+  }
+}
+
+Future<NotificationPermissionStatus> explicitlyRequestNotiPermission() async {
+  if (!kIsWeb) return NotificationPermissionStatus.granted;
+
+  // Prompt the user for permission
+  final result = await html.Notification.requestPermission();
+  if (result == 'granted') {
+    return NotificationPermissionStatus.granted;
+  } else if (result == 'denied') {
+    return NotificationPermissionStatus.denied;
+  } else {
+    return NotificationPermissionStatus.notGranted;
+  }
 }

@@ -72,6 +72,8 @@ class InitializationAppState extends State<InitializationApp> {
         final user = await checkAuthStatus();
         setState(() => _isAuthenticated = user != null);
         if (_isAuthenticated) {
+          await requestNotificationPermission();
+          await uploadFcmToken();
           runApp(const HundyPApp());
         }
       }
@@ -110,8 +112,22 @@ class InitializationAppState extends State<InitializationApp> {
       );
     }
 
-    return const MaterialApp(
-      home: CircularProgressIndicator(),
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 20),
+              Text(
+                _loadingMessage,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

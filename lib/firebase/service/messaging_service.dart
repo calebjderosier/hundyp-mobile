@@ -132,6 +132,7 @@ Future<NotificationPermissionStatus> requestNotificationPermission() async {
 Future<NotificationPermissionStatus> explicitlyRequestNotiPermission() async {
   if (!kIsWeb) return NotificationPermissionStatus.granted;
 
+  // todo - change to the firebase version?
   // Prompt the user for permission
   final result = await html.Notification.requestPermission();
   if (result == 'granted') {

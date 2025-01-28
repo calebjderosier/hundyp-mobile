@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
@@ -41,14 +42,16 @@ class InitializationAppState extends State<InitializationApp> {
 
       setState(() => _loadingMessage = 'Authenticating...');
       await setupAuthPersistence();
-      final user = await checkAuthStatus();
-
+      final user = checkAuthStatus();
       setState(() => _isAuthenticated = user != null);
-
-      setState(() => _loadingMessage = 'Launching app...!');
-      await setupFirebaseMessaging();
-
-      if (_isAuthenticated) {
+      if (!_isAuthenticated && !kIsWeb) {
+        if (user == null) {
+          signInWithFirebase();
+        }
+      } else {
+        setState(() => _loadingMessage = 'Launching app...!');
+        print('is auth');
+        await setupFirebaseMessaging();
         runApp(const HundyPApp());
       }
     } catch (e, stackTrace) {
@@ -69,13 +72,7 @@ class InitializationAppState extends State<InitializationApp> {
     try {
       final isAuthorized = await requestAdditionalScopes();
       if (isAuthorized) {
-        final user = await checkAuthStatus();
-        setState(() => _isAuthenticated = user != null);
-        if (_isAuthenticated) {
-          await requestNotificationPermission();
-          await uploadFcmToken();
-          runApp(const HundyPApp());
-        }
+        runApp(const HundyPApp());
       }
     } catch (e) {
       print('Error requesting scopes: $e');

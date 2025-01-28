@@ -4,11 +4,13 @@ class PushNotificationTokenModel {
   final Timestamp updatedAt;
   final String fcmToken;
   final String displayName;
+  final bool? testMode;
 
   PushNotificationTokenModel({
     required this.updatedAt,
     required this.fcmToken,
     required this.displayName,
+    this.testMode
   });
 
   // Factory constructor to create the model from Firestore data

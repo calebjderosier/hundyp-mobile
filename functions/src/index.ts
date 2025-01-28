@@ -10,6 +10,7 @@ type RequestBody = {
   message: string;
   uid: string;
   email: string;
+  testMode?: boolean;
 };
 
 // todo - replace w/ a DB call to get a random message
@@ -25,7 +26,7 @@ const generateRandomMessage = (displayName: string) => {
 // Cloud Function to send notifications and save event to Firestore
 exports.sendNotification = onCall(
   async ({
-    data: { displayName, message, uid, email },
+    data: { displayName, message, uid, email, testMode },
   }: CallableRequest<RequestBody>) => {
     const missingFields = [];
     if (!uid) missingFields.push("uid");
@@ -48,16 +49,16 @@ exports.sendNotification = onCall(
 
     try {
       // Check if the user email exists in the `validUsers` collection
-      const validUserDoc = await firestore()
-        .collection("validBetaUsers")
-        .doc(email)
-        .get();
+      // const validUserDoc = await firestore()
+      //   .collection("validBetaUsers")
+      //   .doc(email)
+      //   .get();
 
-//       if (!validUserDoc.exists || !validUserDoc.data()?.isActive) {
-      if (false) {
-        console.error(`User ${email} is not authorized.`);
-        return { success: false, message: "User not authorized" };
-      }
+      //       if (!validUserDoc.exists || !validUserDoc.data()?.isActive) {
+      // if (false) {
+      //   console.error(`User ${email} is not authorized.`);
+      //   return { success: false, message: "User not authorized" };
+      // }
 
       // Get all tokens from Firestore collection
       const tokensSnapshot = await firestore()
@@ -65,9 +66,12 @@ exports.sendNotification = onCall(
         .get();
 
       const tokens: string[] = tokensSnapshot.docs.map((doc) => {
+        if (testMode && doc.id !== "test") return;
+
         // only return those which do not belong to the user
-        if (doc.data().uid === uid) return;
-        return doc.data().fcmToken;
+        const data = doc.data();
+        if (data.uid === uid) return;
+        return data.fcmToken;
       });
 
       if (tokens.length === 0) {

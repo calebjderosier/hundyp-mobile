@@ -3,22 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hundy_p/firebase/service/messaging_service.dart';
 
-Future<User?> checkAuthStatus() async {
-  try {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user; // User is already authenticated
-    }
-
-    // Attempt to sign in silently
-    return await signInWithFirebase();
-  } catch (e) {
-    print('Error checking authentication status: $e');
-    return null; // Return null if an error occurs
+User? checkAuthStatus() {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    return user; // User is already authenticated
   }
+  return null; // Return null if an error occurs
 }
-
 
 Future<User?> signInWithFirebase() async {
   try {
@@ -66,7 +59,7 @@ Future<User?> signInWithFirebase() async {
 
     // Sign in with Firebase using the credential
     final UserCredential userCredential =
-    await FirebaseAuth.instance.signInWithCredential(credential);
+        await FirebaseAuth.instance.signInWithCredential(credential);
 
     final user = userCredential.user;
     if (user == null) {
@@ -85,6 +78,7 @@ Future<User?> signInWithFirebase() async {
     return null; // Return null if an error occurs
   }
 }
+
 Future<void> setupAuthPersistence() async {
   if (kIsWeb) {
     await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
@@ -122,6 +116,17 @@ Future<bool> requestAdditionalScopes() async {
     );
 
     final isAuthorized = await googleSignIn.requestScopes(scopes);
+    if (isAuthorized) {
+      final user = await signInWithFirebase();
+      print('User signed in: $user');
+
+      if (user != null) {
+        await setupFirebaseMessaging();
+        print('Firebase messaging setup complete.');
+        await uploadFcmToken();
+        print('FCM token uploaded.');
+      }
+    }
     return isAuthorized;
   } catch (e) {
     print('Error requesting additional scopes: $e');

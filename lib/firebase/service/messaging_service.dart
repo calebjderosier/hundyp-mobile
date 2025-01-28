@@ -34,29 +34,7 @@ Future<void> setupFirebaseMessaging() async {
   }
 
   await uploadFcmToken();
-
-  // Listen for token updates
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    await updateUserToken(newToken);
-  }).onError((err) {
-    print('Error refreshing FCM token: $err');
-  });
-
-  // Foreground messaging
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-
-    if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-      SnackBarHandler().showSnackBar(
-        message:
-            '${message.notification!.title}: ${message.notification!.body}',
-      );
-    }
-  });
-
-  // Background messaging
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  setupMessagingListeners();
 }
 
 Future<String?> getFcmToken() async {
@@ -76,6 +54,7 @@ Future<String?> getFcmToken() async {
     print("Error fetching FCM token: $e");
     return null;
   }
+
 }
 
 Future<void> uploadFcmToken() async {
@@ -89,11 +68,49 @@ Future<void> uploadFcmToken() async {
   await updateUserToken(token);
 }
 
+void setupMessagingListeners() {
+  // Listen for token updates
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    await updateUserToken(newToken);
+  }).onError((err) {
+    print('Error refreshing FCM token: $err');
+  });
+
+  // Foreground messaging
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+      SnackBarHandler().showSnackBar(
+        message:
+        '${message.notification!.title}: ${message.notification!.body}',
+      );
+    }
+  });
+
+  // Background messaging
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+}
+
 // Define an enum to represent the notification permission status
 enum NotificationPermissionStatus {
   granted,
   denied,
   notGranted,
+}
+
+NotificationPermissionStatus getNotificationPermission() {
+  final permission = html.Notification.permission;
+
+  if (permission == 'granted') {
+    return NotificationPermissionStatus.granted;
+  } else if (permission == 'denied') {
+    return NotificationPermissionStatus.denied;
+  } else {
+    return NotificationPermissionStatus.notGranted;
+  }
+
 }
 
 Future<NotificationPermissionStatus> requestNotificationPermission() async {

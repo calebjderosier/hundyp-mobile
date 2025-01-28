@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hundy_p/authenticate.dart';
 import 'package:hundy_p/main.dart';
@@ -22,28 +21,16 @@ class _AuthHandlerState extends State<AuthHandler> {
   }
 
   Future<void> _checkAuthStatus() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        setState(() {
-          _isAuthenticated = true;
-          _isLoading = false;
-        });
-      } else {
-        // Attempt sign-in
-        final signedInUser = await signInWithFirebase();
-        setState(() {
-          _isAuthenticated = signedInUser != null;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error checking auth status: $e');
-      setState(() {
-        _isAuthenticated = false;
-        _isLoading = false;
-      });
-    }
+    setState(() {
+      _isAuthenticated = checkAuthStatus() != null;
+    });
+  }
+
+  Future<void> _onRetry() async {
+    final isAuth = await requestAdditionalScopes();
+    setState(() {
+      _isAuthenticated = isAuth;
+    });
   }
 
   @override
@@ -57,7 +44,7 @@ class _AuthHandlerState extends State<AuthHandler> {
     return _isAuthenticated
         ? const HundyPMain(title: 'Hundy P') // Main app if authenticated
         : UnauthenticatedApp(
-            onRetry: _checkAuthStatus, // Retry logic passed to ErrorApp
+            onRetry: _onRetry, // Retry logic passed to ErrorApp
           );
   }
 }

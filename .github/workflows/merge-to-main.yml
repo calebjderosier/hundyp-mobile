@@ -4,6 +4,7 @@ on:
   push:
     branches:
 #       - main
+      - notactuallymain
 # todo need env vars on github
 
 jobs:

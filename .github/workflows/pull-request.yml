@@ -3,6 +3,12 @@ name: Deploy to Firebase Hosting on PR
 # todo need env vars on github
 #on: pull_request
 
+on:
+  push:
+    branches:
+      #       - main
+      - notactuallymain
+
 permissions:
   checks: write
   contents: read

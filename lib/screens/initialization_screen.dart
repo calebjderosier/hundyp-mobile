@@ -48,7 +48,9 @@ class InitializationAppState extends State<InitializationApp> {
       setState(() => _loadingMessage = 'Launching app...!');
       await setupFirebaseMessaging();
 
-      runApp(const HundyPApp());
+      if (_isAuthenticated) {
+        runApp(const HundyPApp());
+      }
     } catch (e, stackTrace) {
       print('Error during initialization: $e');
       print('Stack trace: $stackTrace');
@@ -63,6 +65,21 @@ class InitializationAppState extends State<InitializationApp> {
     }
   }
 
+  Future<void> _requestScopes() async {
+    try {
+      final isAuthorized = await requestAdditionalScopes();
+      if (isAuthorized) {
+        final user = await checkAuthStatus();
+        setState(() => _isAuthenticated = user != null);
+        if (_isAuthenticated) {
+          runApp(const HundyPApp());
+        }
+      }
+    } catch (e) {
+      print('Error requesting scopes: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_hasError) {
@@ -74,22 +91,27 @@ class InitializationAppState extends State<InitializationApp> {
       );
     }
 
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 20),
-              Text(
-                _loadingMessage,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
+    if (!_isAuthenticated) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('You are not signed in.'),
+                ElevatedButton(
+                  onPressed: _requestScopes,
+                  child: const Text('Request Permissions'),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+      );
+    }
+
+    return const MaterialApp(
+      home: CircularProgressIndicator(),
     );
   }
 }

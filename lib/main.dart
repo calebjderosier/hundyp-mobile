@@ -3,6 +3,7 @@ import 'package:hundy_p/screens/authenticated_home.dart';
 import 'package:hundy_p/screens/chat_room.dart';
 import 'package:hundy_p/screens/error_screen.dart';
 import 'package:hundy_p/screens/initialization_screen.dart';
+import 'package:hundy_p/screens/ledger_screen.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
 import 'package:hundy_p/state_handlers/snackbar_handler.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -102,9 +103,7 @@ class _HundyPMainState extends State<HundyPMain> {
   final List _navPages = const [
     HomePage(title: "Hundy P"),
     ChatRoomPage(),
-    Center(
-      child: Text("TODO: Ledger"),
-    ),
+    LedgerScreen(),
   ];
 
   void _changeTab(int index) {

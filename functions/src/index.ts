@@ -62,6 +62,7 @@ exports.sendNotification = onCall(
       const tokensSnapshot = await firestore()
         .collection("pushNotificationTokens")
         .get();
+
       const tokens: string[] = tokensSnapshot.docs.map((doc) => {
         // only return those which do not belong to the user
         if (doc.data().uid === uid) return;

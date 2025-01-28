@@ -11,7 +11,6 @@ class AuthHandler extends StatefulWidget {
 }
 
 class _AuthHandlerState extends State<AuthHandler> {
-  bool _isLoading = true;
   bool _isAuthenticated = false;
 
   @override
@@ -35,12 +34,6 @@ class _AuthHandlerState extends State<AuthHandler> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return _isAuthenticated
         ? const HundyPMain(title: 'Hundy P') // Main app if authenticated
         : UnauthenticatedApp(

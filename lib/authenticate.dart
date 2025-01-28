@@ -25,27 +25,15 @@ Future<User?> signInWithFirebase() async {
         'https://www.googleapis.com/auth/userinfo.profile',
         // Required for People API
       ];
-    final GoogleSignIn googleSignIn = await GoogleSignIn(
+    final GoogleSignIn googleSignIn = GoogleSignIn(
       clientId: webClientId,
       scopes: scopes,
     );
 
     GoogleSignInAccount? account;
 
-    // native only
-    // if (!kIsWeb) {
       account = await googleSignIn.signInSilently();
-    // }
     bool isAuthorized = account != null;
-
-    if (kIsWeb && account != null) {
-      isAuthorized = await googleSignIn.canAccessScopes(scopes);
-    }
-
-    if (kIsWeb && !isAuthorized){
-      print('should fail');
-      await googleSignIn.requestScopes(scopes);
-    }
 
     if (account == null) {
       // The user canceled the sign-in
@@ -72,10 +60,6 @@ Future<User?> signInWithFirebase() async {
     if (user == null) {
       print('Firebase sign-in failed.');
       return null;
-    }
-    // However, on web...
-    if (kIsWeb) {
-      isAuthorized = await googleSignIn.canAccessScopes(scopes);
     }
 
     // Signed in with Firebase

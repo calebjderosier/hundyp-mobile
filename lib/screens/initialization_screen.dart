@@ -18,6 +18,7 @@ class InitializationApp extends StatefulWidget {
 class InitializationAppState extends State<InitializationApp> {
   String _loadingMessage = 'Starting up...';
   bool _hasError = false;
+  bool _isAuthenticated = false;
   String? _errorMessage;
   String? _stackTrace;
 
@@ -40,7 +41,9 @@ class InitializationAppState extends State<InitializationApp> {
 
       setState(() => _loadingMessage = 'Authenticating...');
       await setupAuthPersistence();
-      await checkAuthStatus();
+      final user = await checkAuthStatus();
+
+      setState(() => _isAuthenticated = user != null);
 
       setState(() => _loadingMessage = 'Launching app...!');
       await setupFirebaseMessaging();

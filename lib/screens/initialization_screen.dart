@@ -18,6 +18,7 @@ class InitializationApp extends StatefulWidget {
 
 class InitializationAppState extends State<InitializationApp> {
   String _loadingMessage = 'Starting up...';
+  bool _isLoading = true;
   bool _hasError = false;
   bool _isAuthenticated = false;
   String? _errorMessage;
@@ -31,56 +32,81 @@ class InitializationAppState extends State<InitializationApp> {
 
   Future<void> _initializeApp() async {
     try {
+      print('Step: Loading environment variables...');
       setState(() => _loadingMessage = 'Loading environment variables...');
       await dotenv.load(fileName: 'dotenv');
 
+      print('Step: Initializing Firebase...');
       setState(() => _loadingMessage = 'Initializing Backend...');
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
 
       setupLogging();
 
+      print('Step: Authenticating...');
       setState(() => _loadingMessage = 'Authenticating...');
       await setupAuthPersistence();
       final user = checkAuthStatus();
-      setState(() => _isAuthenticated = user != null);
+      _isAuthenticated = user != null;
+
       if (!_isAuthenticated && !kIsWeb) {
-        if (user == null) {
-          signInWithFirebase();
-        }
+        print('Step: Attempting mobile sign-in...');
+        await signInWithFirebase();
       } else {
-        setState(() => _loadingMessage = 'Launching app...!');
-        print('is auth');
         await setupFirebaseMessaging();
-        runApp(const HundyPApp());
       }
     } catch (e, stackTrace) {
       print('Error during initialization: $e');
       print('Stack trace: $stackTrace');
-
-      // Log error to Firebase Crashlytics
       logError(e: e, stackTrace: stackTrace, fatal: true);
-      setState(() {
-        _hasError = true;
-        _errorMessage = e.toString();
-        _stackTrace = stackTrace.toString();
-      });
+      _hasError = true;
+      _errorMessage = e.toString();
+      _stackTrace = stackTrace.toString();
+    } finally {
+      print('Step: Launching app!');
+      setState(() => _isLoading = false);
     }
   }
 
   Future<void> _requestScopes() async {
     try {
+      print('Step: Requesting additional scopes...');
       final isAuthorized = await requestAdditionalScopes();
       if (isAuthorized) {
-        runApp(const HundyPApp());
+        print('Step: User authorized. Signing in...');
+        await signInWithFirebase();
+        setState(() => _isAuthenticated = true);
+        print('Step: Set to true');
       }
     } catch (e) {
       print('Error requesting scopes: $e');
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Text(
+                  _loadingMessage,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     if (_hasError) {
       return MaterialApp(
         home: ErrorScreen(
@@ -100,7 +126,7 @@ class InitializationAppState extends State<InitializationApp> {
                 const Text('You are not signed in.'),
                 ElevatedButton(
                   onPressed: _requestScopes,
-                  child: const Text('Request Permissions'),
+                  child: const Text('Please Request Permissions'),
                 ),
               ],
             ),
@@ -109,22 +135,7 @@ class InitializationAppState extends State<InitializationApp> {
       );
     }
 
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 20),
-              Text(
-                _loadingMessage,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    // Only return the main app once everything is checked
+    return const HundyPApp();
   }
 }

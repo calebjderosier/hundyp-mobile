@@ -66,8 +66,6 @@ exports.sendNotification = onCall(
         .get();
 
       const tokens: string[] = tokensSnapshot.docs.map((doc) => {
-        if (testMode && doc.id !== "test") return;
-
         // only return those which do not belong to the user
         const data = doc.data();
         if (data.uid === uid) return;
@@ -89,29 +87,54 @@ exports.sendNotification = onCall(
       console.log(`Saved Hundy P event to Firestore: ${eventDocRef.id}`);
 
       try {
-        // Send a notification to all tokens
-        const response = await messaging().sendEachForMulticast({
-          tokens,
-          ...pushNotificationMessage,
-          // Define Android-specific notification options
-          // todo, issues https://github.com/calebjderosier/hundyp-mobile/issues/29 and 28
-          android: {
-            priority: "high", // Required for heads-up notifications
-            notification: {
-              ...pushNotificationMessage.notification,
-              channelId: "high_priority_channel", // Match the channel ID created in the app
-              sound: "default", // Default notification sound
-              priority: "high", // Ensure visibility for heads-up notifications
-              visibility: "public", // Ensure it's visible on the lock screen
-            },
-          },
-        });
+        if (testMode) {
+          const testToken = tokensSnapshot.docs.find(
+            (doc) => doc.id === "test",
+          );
+          if (!testToken) {
+            return {
+              success: false,
+              message: "Test mode enabled but no test token found.",
+            };
+          }
 
-        console.log("Notifications sent:", response);
-        return {
-          success: true,
-          message: "Notifications sent and event saved successfully.",
-        };
+          await messaging().send({
+            token: testToken.data().fcmToken,
+            notification: {
+              title: "Test notification",
+              body: "This is a test notification.",
+            },
+          }),
+            true;
+          return {
+            success: true,
+            message: "Test notification sent and event saved successfully.",
+          };
+        } else {
+          // Send a notification to all tokens
+          const response = await messaging().sendEachForMulticast({
+            tokens,
+            ...pushNotificationMessage,
+            // Define Android-specific notification options
+            // todo, issues https://github.com/calebjderosier/hundyp-mobile/issues/29 and 28
+            android: {
+              priority: "high", // Required for heads-up notifications
+              notification: {
+                ...pushNotificationMessage.notification,
+                channelId: "high_priority_channel", // Match the channel ID created in the app
+                sound: "default", // Default notification sound
+                priority: "high", // Ensure visibility for heads-up notifications
+                visibility: "public", // Ensure it's visible on the lock screen
+              },
+            },
+          });
+
+          console.log("Notifications sent:", response);
+          return {
+            success: true,
+            message: "Notifications sent and event saved successfully.",
+          };
+        }
       } catch (notificationError) {
         console.error("Error sending notifications:", notificationError);
 

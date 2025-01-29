@@ -8,6 +8,7 @@ import 'package:hundy_p/firebase/service/messaging_service.dart';
 import 'package:hundy_p/firebase_options.dart';
 import 'package:hundy_p/main.dart';
 import 'package:hundy_p/screens/error_screen.dart';
+import 'package:hundy_p/state_handlers/auth_handler.dart';
 
 class InitializationApp extends StatefulWidget {
   const InitializationApp({Key? key}) : super(key: key);
@@ -49,12 +50,18 @@ class InitializationAppState extends State<InitializationApp> {
       final user = checkAuthStatus();
       _isAuthenticated = user != null;
 
+      if (_isAuthenticated) {
+        print('Step: Setting up Firebase Messaging...');
+        await setupFirebaseMessaging();
+      }
+
       if (!_isAuthenticated && !kIsWeb) {
         print('Step: Attempting mobile sign-in...');
         await signInWithFirebase();
-      } else {
-        await setupFirebaseMessaging();
+        _isAuthenticated = checkAuthStatus() != null;
       }
+
+
     } catch (e, stackTrace) {
       print('Error during initialization: $e');
       print('Stack trace: $stackTrace');
@@ -63,24 +70,7 @@ class InitializationAppState extends State<InitializationApp> {
       _errorMessage = e.toString();
       _stackTrace = stackTrace.toString();
     } finally {
-      print('Step: Launching app!');
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _requestScopes() async {
-    try {
-      print('Step: Requesting additional scopes...');
-      final isAuthorized = await requestAdditionalScopes();
-      if (isAuthorized) {
-        print('Step: User authorized. Signing in...');
-        await signInWithFirebase();
-        setState(() => _isAuthenticated = true);
-        print('Step: Set to true');
-      }
-    } catch (e) {
-      print('Error requesting scopes: $e');
-    } finally {
+      print('Step: Finalizing Initialization...');
       setState(() => _isLoading = false);
     }
   }
@@ -90,17 +80,17 @@ class InitializationAppState extends State<InitializationApp> {
     if (_isLoading) {
       return MaterialApp(
         home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 20),
-                Text(
-                  _loadingMessage,
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ],
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 20),
+              Text(
+                _loadingMessage,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
             ),
           ),
         ),
@@ -116,26 +106,8 @@ class InitializationAppState extends State<InitializationApp> {
       );
     }
 
-    if (!_isAuthenticated) {
-      return MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('You are not signed in.'),
-                ElevatedButton(
-                  onPressed: _requestScopes,
-                  child: const Text('Please Request Permissions'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Only return the main app once everything is checked
-    return const HundyPApp();
+    return _isAuthenticated
+        ? const HundyPApp()
+        : const AuthHandler(); // Transition to user-driven authentication
   }
 }

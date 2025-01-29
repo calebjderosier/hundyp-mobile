@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hundy_p/screens/authenticated_home.dart';
 import 'package:hundy_p/screens/chat_room.dart';
@@ -6,16 +7,16 @@ import 'package:hundy_p/screens/initialization_screen.dart';
 import 'package:hundy_p/screens/ledger_screen.dart';
 import 'package:hundy_p/state_handlers/auth_handler.dart';
 import 'package:hundy_p/state_handlers/snackbar_handler.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   FlutterError.onError = (FlutterErrorDetails details) {
-    // Redirect to the Error Screen
-    runApp(ErrorScreen(
-      errorMessage: details.exceptionAsString(),
-      stackTrace: details.stack.toString(),
+    runApp(MaterialApp(
+      home: ErrorScreen(
+        errorMessage: details.exceptionAsString(),
+        stackTrace: details.stack.toString(),
+      ),
     ));
   };
 
@@ -114,7 +115,8 @@ class _HundyPMainState extends State<HundyPMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return MaterialApp(
+        home: Scaffold(
       body: _navPages[_selectedTab],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedTab,
@@ -142,6 +144,6 @@ class _HundyPMainState extends State<HundyPMain> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

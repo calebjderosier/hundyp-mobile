@@ -27,7 +27,7 @@ module.exports = {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
     // prettier-ignore
-    "indent": ["error", 2],
+    "indent": 0,
     "object-curly-spacing": 0,
     "max-len": ["error", { code: 120 }],
   },

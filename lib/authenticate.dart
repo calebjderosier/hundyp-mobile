@@ -117,15 +117,15 @@ Future<bool> requestAdditionalScopes() async {
 
     final isAuthorized = await googleSignIn.requestScopes(scopes);
     if (isAuthorized) {
-      final user = await signInWithFirebase();
-      print('User signed in: $user');
+      // final user = await signInWithFirebase();
+      // print('User signed in: $user');
 
-      if (user != null) {
+      // if (user != null) {
         await setupFirebaseMessaging();
         print('Firebase messaging setup complete.');
         await uploadFcmToken();
         print('FCM token uploaded.');
-      }
+      // }
     }
     return isAuthorized;
   } catch (e) {

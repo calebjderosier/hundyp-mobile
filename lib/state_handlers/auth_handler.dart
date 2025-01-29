@@ -39,10 +39,9 @@ class _AuthHandlerState extends State<AuthHandler> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const MaterialApp(
-        home: Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        )
-      );
+          home: Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ));
     }
 
     return _isAuthenticated

@@ -32,7 +32,7 @@ class UnauthenticatedApp extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Try Again',
+                  'Log in',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimary,
                     fontSize: 16,

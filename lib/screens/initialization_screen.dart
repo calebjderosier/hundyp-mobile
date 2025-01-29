@@ -34,41 +34,44 @@ class InitializationAppState extends State<InitializationApp> {
   Future<void> _initializeApp() async {
     try {
       print('Step: Loading environment variables...');
-      setState(() => _loadingMessage = 'Loading environment variables...');
+      setState(() => _loadingMessage = 'v0.69.4');
       await dotenv.load(fileName: 'dotenv');
 
       print('Step: Initializing Firebase...');
-      setState(() => _loadingMessage = 'Initializing Backend...');
+      // setState(() => _loadingMessage = 'Initializing Backend...');
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
 
       setupLogging();
 
+      setState(() => _loadingMessage = 'Auth');
       print('Step: Authenticating...');
-      setState(() => _loadingMessage = 'Authenticating...');
+      // setState(() => _loadingMessage = 'Authenticating...');
       await setupAuthPersistence();
       final user = checkAuthStatus();
       _isAuthenticated = user != null;
 
       if (_isAuthenticated) {
         print('Step: Setting up Firebase Messaging...');
+        setState(() => _loadingMessage = 'Set up messaging: $_isAuthenticated');
         await setupFirebaseMessaging();
       }
 
       if (!_isAuthenticated && !kIsWeb) {
         print('Step: Attempting mobile sign-in...');
+        setState(() => _loadingMessage = 'Signing in');
         await signInWithFirebase();
         _isAuthenticated = checkAuthStatus() != null;
       }
-
-
     } catch (e, stackTrace) {
       print('Error during initialization: $e');
       print('Stack trace: $stackTrace');
-      logError(e: e, stackTrace: stackTrace, fatal: true);
-      _hasError = true;
-      _errorMessage = e.toString();
-      _stackTrace = stackTrace.toString();
+      if (!_isAuthenticated) {
+        logError(e: e, stackTrace: stackTrace, fatal: true);
+        _hasError = true;
+        _errorMessage = e.toString();
+        _stackTrace = stackTrace.toString();
+      }
     } finally {
       print('Step: Finalizing Initialization...');
       setState(() => _isLoading = false);
@@ -80,17 +83,17 @@ class InitializationAppState extends State<InitializationApp> {
     if (_isLoading) {
       return MaterialApp(
         home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 20),
-              Text(
-                _loadingMessage,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Text(
+                  _loadingMessage,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
             ),
           ),
         ),

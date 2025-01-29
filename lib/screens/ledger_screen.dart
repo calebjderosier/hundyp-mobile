@@ -26,7 +26,7 @@ class LedgerScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Version 0.69.1',
+              'Version 0.69.3',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             Text(

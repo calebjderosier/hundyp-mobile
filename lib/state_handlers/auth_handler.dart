@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hundy_p/authenticate.dart';
+import 'package:hundy_p/firebase/service/messaging_service.dart';
 import 'package:hundy_p/main.dart';
 import 'package:hundy_p/screens/unauthenticated_home.dart';
 
@@ -28,9 +29,18 @@ class _AuthHandlerState extends State<AuthHandler> {
 
   Future<void> _onRetry() async {
     setState(() => _isLoading = true);
-    final isAuth = await requestAdditionalScopes();
+    var user;
+    try {
+      user = signInWithFirebase();
+      await requestAdditionalScopes();
+      await setupFirebaseMessaging();
+      print('Firebase messaging setup complete.');
+      await uploadFcmToken();
+    } catch (e) {
+      print('nope');
+    }
     setState(() {
-      _isAuthenticated = isAuth;
+      _isAuthenticated = user;
     });
     setState(() => _isLoading = false);
   }

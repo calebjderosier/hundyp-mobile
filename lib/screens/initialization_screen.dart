@@ -34,7 +34,8 @@ class InitializationAppState extends State<InitializationApp> {
   Future<void> _initializeApp() async {
     try {
       print('Step: Loading environment variables...');
-      setState(() => _loadingMessage = 'v0.69.4');
+      setState(() => _loadingMessage = 'v0.69.7');
+      await Future.delayed(const Duration(seconds: 1)); // Block for 0.5 seconds
       await dotenv.load(fileName: 'dotenv');
 
       print('Step: Initializing Firebase...');

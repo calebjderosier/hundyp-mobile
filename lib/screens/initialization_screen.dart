@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
+import 'package:hundy_p/component/google_sign_in_button.dart';
 import 'package:hundy_p/firebase/logging/firebase_logging.dart';
 import 'package:hundy_p/firebase/service/messaging_service.dart';
 import 'package:hundy_p/firebase_options.dart';
@@ -99,19 +100,10 @@ class InitializationAppState extends State<InitializationApp> {
     }
 
     if (!_isAuthenticated) {
-      return MaterialApp(
+      return const MaterialApp(
         home: Scaffold(
           body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('You are not signed in.'),
-                ElevatedButton(
-                  onPressed: _requestScopes,
-                  child: const Text('Request Permissions'),
-                ),
-              ],
-            ),
+            child: GoogleSignInComponent(),
           ),
         ),
       );

@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hundy_p/authenticate.dart';
@@ -25,14 +26,21 @@ class InitializationAppState extends State<InitializationApp> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    if (kIsWeb) {
+      _initializeWebApp();
+    } else {
+      _initializeNativeApp();
+    }
   }
 
-  Future<void> _initializeApp() async {
-    try {
-      setState(() => _loadingMessage = 'Loading environment variables...');
-      await dotenv.load(fileName: 'dotenv');
+  Future<void> _initializeWebApp() async {
+    setState(() => _loadingMessage = 'Loading environment variables...');
+    await dotenv.load(fileName: 'dotenv');
+    await setupAuthPersistence();
+  }
 
+  Future<void> _initializeNativeApp() async {
+    try {
       setState(() => _loadingMessage = 'Initializing Backend...');
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
@@ -40,7 +48,6 @@ class InitializationAppState extends State<InitializationApp> {
       setupLogging();
 
       setState(() => _loadingMessage = 'Authenticating...');
-      await setupAuthPersistence();
       final user = await checkAuthStatus();
 
       setState(() => _isAuthenticated = user != null);
@@ -110,8 +117,21 @@ class InitializationAppState extends State<InitializationApp> {
       );
     }
 
-    return const MaterialApp(
-      home: CircularProgressIndicator(),
-    );
+    return MaterialApp(
+        home: Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            Text(
+              _loadingMessage,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }
